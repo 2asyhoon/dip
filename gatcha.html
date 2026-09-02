@@ -318,7 +318,7 @@
                 </div>
 
                 <input type="text" id="user-id" style="padding:18px; width:100%; border-radius:15px; border:none; text-align:center; font-size:18px; font-weight:bold; color:black;" placeholder="인스타 아이디 입력">
-                <button onclick="enterApp()" class="primary-btn">가차 시작하기</button>
+                <button onclick="enterApp()" class="primary-btn">픽업</button>
                 <button onclick="document.getElementById('admin-modal').style.display='flex'" class="admin-trigger">ADMIN AUTH</button>
                 
                 
@@ -411,7 +411,6 @@
         let isAdmin = false;
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby801Rwprk3W13F-NhRrgoO4E9FcYfjc3jCKTm1Kw3u5vw7Wh4F2DG-fbS5Ck4JP-OW/exec";
 
-        // 배경 비디오 및 오디오 재생 처리
         function startReversePixelTransition() {
             try {
                 const bgVideo = document.getElementById('bg-video');
@@ -440,14 +439,20 @@
 
         function enterApp() {
             const id = document.getElementById('user-id').value.trim();
-            if(!id) return alert("인스타 ID를 입력하세요!");
+            if(!id) {
+                if(document.getElementById('admin-pw').value === "4444") {
+                    verifyAdmin();
+                    return;
+                }
+                return alert("인스타 ID를 입력하세요!");
+            }
             
             currentUser = id;
             
             const wipe = document.createElement('div');
             wipe.id = 'loadingWipe';
             wipe.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999; display:flex; justify-content:center; align-items:center; color:#ffcc00; font-family:"DungGeunMo", sans-serif; font-size:2rem; opacity:0; transition:opacity 0.5s;';
-            wipe.innerText = "데이터 연동 중...";
+            wipe.innerText = "Loading...";
             document.body.appendChild(wipe);
             
             setTimeout(() => { wipe.style.opacity = '1'; }, 50);
@@ -463,7 +468,6 @@
                 setTimeout(() => wipe.remove(), 500);
                 
                 document.getElementById('intro-gate').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'flex';
                 
                 updateUI(data);
@@ -473,6 +477,70 @@
                 alert("시트 연동 실패: " + e);
                 wipe.remove();
             });
+        }
+        
+        function verifyAdmin() {
+            if(document.getElementById('admin-pw').value === "4444") {
+                isAdmin = true; 
+                currentUser = "ADMIN";
+                document.getElementById('admin-modal').style.display = 'none';
+                document.getElementById('intro-gate').style.display = 'none';
+                document.getElementById('main-content').style.display = 'flex';
+                document.getElementById('admin-controls').style.display = 'flex';
+                
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_status' }),
+                    headers: { 'Content-Type': 'text/plain' }
+                }).then(r => r.json()).then(data => {
+                    updateUI(data);
+                    setupSimulationCards();
+                });
+            } else {
+                alert("비밀번호가 틀렸습니다.");
+            }
+        }
+        
+        function exitAdmin() { 
+            isAdmin = false; 
+            document.getElementById('admin-controls').style.display = 'none'; 
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('intro-gate').style.display = 'block';
+        }
+
+        function setupSimulationCards() {
+            const cardArea = document.getElementById('card-area');
+            cardArea.innerHTML = '';
+            
+            const ranks = ['A', 'B', 'C', 'Fail'];
+            
+            ranks.forEach((rank, index) => {
+                const card = document.createElement('div');
+                card.className = 'gacha-card deck';
+                
+                // 임시로 뒷면을 렌더링해둡니다. 클릭 시 서버 요청 없이 테스트용으로 뒤집힙니다.
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-face card-front"></div>
+                        <div class="card-face card-back rank-${rank}">
+                            ${rank === 'Fail' ? '꽝' : rank + '상'}
+                        </div>
+                    </div>
+                `;
+                
+                card.onclick = () => selectCardSim(card, rank, 999, cardArea.children);
+                cardArea.appendChild(card);
+            });
+            
+            setTimeout(() => {
+                const cards = cardArea.children;
+                if(cards.length === 4) {
+                    cards[0].classList.add('card-sim-0');
+                    cards[1].classList.add('card-sim-1');
+                    cards[2].classList.add('card-sim-2');
+                    cards[3].classList.add('card-sim-3');
+                }
+            }, 100);
         }
 
         function setupCards(availableNums) {
@@ -490,26 +558,29 @@
             
             selectedThree.forEach((num, index) => {
                 const card = document.createElement('div');
-                card.className = `card card-pos-${index}`;
+                card.className = 'gacha-card deck'; 
                 
-                const inner = document.createElement('div');
-                inner.className = 'card-inner';
+                // 뒷면은 결과를 받기 전이므로 비워둡니다 (클릭 시점에 서버에서 받아서 채움)
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-face card-front"></div>
+                        <div class="card-face card-back" id="card-back-${num}">
+                        </div>
+                    </div>
+                `;
                 
-                const front = document.createElement('div');
-                front.className = 'card-front';
-                front.innerHTML = `<img src="c1.png" style="width:100%; height:100%; object-fit:cover;">`;
-                
-                const back = document.createElement('div');
-                back.className = 'card-back';
-                back.innerHTML = `<img src="c2.png" style="width:100%; height:100%; object-fit:cover;">`;
-                
-                inner.appendChild(front);
-                inner.appendChild(back);
-                card.appendChild(inner);
+                card.onclick = () => selectCard(card, num, cardArea.children);
                 cardArea.appendChild(card);
-                
-                card.onclick = () => selectCard(card, num, document.querySelectorAll('.card'));
             });
+            
+            setTimeout(() => {
+                const cards = cardArea.children;
+                if(cards.length === 3) {
+                    cards[0].classList.add('card-pos-0');
+                    cards[1].classList.add('card-pos-1');
+                    cards[2].classList.add('card-pos-2');
+                }
+            }, 100);
         }
 
         function spawnRandomParticle(container, color) {
@@ -570,6 +641,7 @@
             if(isDrawing) return;
             isDrawing = true;
             document.getElementById('instruction-text').innerText = "결과 확인 중...";
+            selectedNum = num;
             
             Array.from(allCards).forEach(c => {
                 if (c === card) {
@@ -597,6 +669,13 @@
                 if(sheetRank === "Gold") rank = 'A';
                 else if(sheetRank === "Purple") rank = 'B';
                 else if(sheetRank === "Blue") rank = 'C';
+                
+                // 카드 뒷면 내용 채우기
+                const cardBack = document.getElementById(`card-back-${num}`);
+                if(cardBack) {
+                    cardBack.className = `card-face card-back rank-${rank}`;
+                    cardBack.innerHTML = rank === 'Fail' ? '꽝' : rank + '상';
+                }
                 
                 updateUI(res.status);
 
@@ -658,6 +737,74 @@
                 location.reload();
             });
         }
+        
+        // 관리자 테스트용 selectCard (시트 연동 안함)
+        function selectCardSim(card, rank, num, allCards) {
+            if(isDrawing) return;
+            isDrawing = true;
+            document.getElementById('instruction-text').innerText = "결과 확인 중...";
+            selectedNum = num;
+            
+            Array.from(allCards).forEach(c => {
+                if (c === card) {
+                    c.classList.add('card-focus');
+                } else {
+                    c.classList.add('card-hidden');
+                }
+            });
+
+            const processResult = () => {
+                card.classList.add('flipped');
+                const rect = card.getBoundingClientRect();
+                emitParticles(rect.left + rect.width/2, rect.top + rect.height/2, rank);
+                
+                setTimeout(() => {
+                    Array.from(allCards).forEach(c => {
+                        if(c !== card) {
+                            c.classList.remove('card-hidden');
+                            c.classList.add('flipped');
+                            c.style.opacity = '0.5';
+                        }
+                    });
+                }, 1000);
+                
+                setTimeout(() => {
+                    showResultModal(rank, num);
+                }, 2500);
+            };
+
+            if (rank === 'Fail') {
+                setTimeout(processResult, 600);
+                return;
+            }
+
+            let color = '#777777';
+            if (rank === 'A') color = '#ffcc00';
+            else if (rank === 'B') color = '#a55eea';
+            else if (rank === 'C') color = '#4facfe';
+            
+            const overlay = document.getElementById('magic-circle-overlay');
+            const clickArea = document.getElementById('magic-circle-click');
+            overlay.style.setProperty('--circle-color', color);
+            overlay.style.display = 'flex';
+            
+            let particleInterval;
+            
+            setTimeout(() => {
+                overlay.classList.add('active');
+                particleInterval = setInterval(() => {
+                    for(let i=0; i<3; i++) spawnRandomParticle(clickArea, color);
+                }, 150);
+            }, 100);
+
+            overlay.onclick = () => {
+                overlay.onclick = null;
+                clearInterval(particleInterval);
+                overlay.classList.remove('active');
+                setTimeout(() => { overlay.style.display = 'none'; clickArea.querySelectorAll('div').forEach(el => { if(el.style.position === 'absolute' && !el.className.includes('magic-')) el.remove(); }); }, 500);
+                processResult();
+            };
+        }
 
         function showResultModal(rank, num) {
             let resultMsgHTML = "";
@@ -682,15 +829,37 @@
         }
 
         function closeResultPopup() {
-            location.reload();
+            if(isAdmin) {
+                document.getElementById('result-popup').classList.remove('active');
+                setTimeout(() => { document.getElementById('result-popup').style.display = 'none'; }, 500);
+                document.getElementById('instruction-text').innerText = "시뮬레이션 모드. 카드를 다시 고르세요.";
+                isDrawing = false;
+            } else {
+                location.reload();
+            }
         }
 
         function saveImg() {
-            alert("이미지 저장은 모바일 기기에서 지원됩니다.");
+            html2canvas(document.getElementById('capture-area'), { scale: 2, backgroundColor: null }).then(canvas => {
+                const link = document.createElement('a'); link.download = `IVIV TOYS_RESULT_${selectedNum}.png`; link.href = canvas.toDataURL(); link.click();
+            });
         }
 
         async function shareInsta() {
-            alert("인스타그램 공유는 모바일 기기에서 지원됩니다.");
+            const captureArea = document.getElementById('capture-area');
+            try {
+                const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: null });
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], 'IVIV TOYS_gacha.png', { type: 'image/png' });
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({ files: [file], title: 'IVIV TOYS GACHA', text: '당첨 확인! @IVIV TOYS' });
+                    } else {
+                        alert("이미지 저장 후 인스타그램 스토리에 공유해주세요!");
+                        saveImg();
+                        setTimeout(() => { window.location.href = "instagram://camera"; }, 1000);
+                    }
+                });
+            } catch (err) { alert("캡처 중 오류 발생. 다운로드 버튼을 이용해주세요."); }
         }
 
         function updateUI(status) {
@@ -712,7 +881,7 @@
             if (gateB) gateB.innerText = Math.max(0, counts.Purple);
             if (gateC) gateC.innerText = Math.max(0, counts.Blue);
             
-            const logHTML = history.map(h => `<div style="padding:4px 0;">@${h.user}: <span style="color:var(--gold)">${h.num}번</span> - ${h.prize === 'Lose' ? '꽝' : h.prize}</div>`).join('');
+            const logHTML = history.map(h => `<div style="padding:4px 0;">@${h.user}: <span style="color:var(--gold)">${h.num}번</span> - ${h.prize === 'Lose' ? '꽝' : h.prize + '상'}</div>`).join('');
             const gateLog = document.getElementById('gate-log');
             if (gateLog) gateLog.innerHTML = logHTML;
         }
@@ -754,7 +923,6 @@
 
 </body>
 </html>
-
 
 
 
