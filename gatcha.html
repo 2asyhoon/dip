@@ -449,23 +449,6 @@
         let currentUser = "";
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby801Rwprk3W13F-NhRrgoO4E9FcYfjc3jCKTm1Kw3u5vw7Wh4F2DG-fbS5Ck4JP-OW/exec"; let selectedNum = null; let isAdmin = false;
 
-        function initWinners() {
-            try {
-                const saved = localStorage.getItem('IVIV TOYS_winners');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    if (data && Array.isArray(data.a) && Array.isArray(data.b)) {
-                        winners.a = new Set(data.a);
-                        winners.b = new Set(data.b);
-                        if(data.c) winners.c = new Set(data.c);
-                        return;
-                    }
-                }
-            } catch(e) { console.error(e); }
-            generateNewWinners();
-        }
-
-        // 50개 범위 생성
         function generateNewWinners() {
             let nums = Array.from({length: 50}, (_, i) => i + 1).sort(() => Math.random() - 0.5);
             winners.a = new Set(nums.slice(0, 1)); 
@@ -747,7 +730,6 @@
                 }
             });
 
-            // 서버에 뽑기 요청 전송
             fetch(WEB_APP_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'draw', userId: currentUser, drawNum: num }),
@@ -761,13 +743,12 @@
                     return;
                 }
                 
-                const sheetRank = res.result; // "Gold", "Purple", "Blue", "Lose"
+                const sheetRank = res.result; 
                 let rank = 'Fail';
-                if(sheetRank === 'Gold') rank = 'A';
-                else if(sheetRank === 'Purple') rank = 'B';
-                else if(sheetRank === 'Blue') rank = 'C';
+                if(sheetRank === "Gold") rank = 'A';
+                else if(sheetRank === "Purple") rank = 'B';
+                else if(sheetRank === "Blue") rank = 'C';
                 
-                // 데이터 업데이트
                 window.globalGachaStatus = res.status;
                 updateUI(res.status);
 
@@ -782,7 +763,7 @@
                         overlay.classList.remove('active');
                         card.style.transform = "translate(-50%, -50%) rotateY(180deg) scale(1.5)";
                         card.style.zIndex = "1000";
-                        showResultPopup(rank, num);
+                        showResultModal(rank, num);
                     } else {
                         let cColor = '';
                         if(rank === 'A') cColor = 'var(--gold)';
@@ -809,7 +790,7 @@
                             
                             overlay.classList.remove('active');
                             card.style.transform = "translate(-50%, -50%) rotateY(180deg) scale(1.5)";
-                            showResultPopup(rank, num);
+                            showResultModal(rank, num);
                         };
                         
                         setTimeout(() => {
@@ -823,73 +804,6 @@
                 alert("결과 통신 에러: " + e);
                 location.reload();
             });
-        });
-
-            const processResult = () => {
-                card.classList.add('flipped');
-                const rect = card.getBoundingClientRect();
-                emitParticles(rect.left + rect.width/2, rect.top + rect.height/2, rank);
-                
-                if (!isAdmin) {
-                    const history = (function(){ try { let d=JSON.parse(localStorage.getItem('gachaHistory')); return Array.isArray(d) ? d : []; } catch(e) { return []; } })();
-                    history.unshift({user: currentUser, num: num, prize: rank === 'Fail' ? '꽝' : rank + '상'});
-                    localStorage.setItem('gachaHistory', JSON.stringify(history));
-                    updateUI();
-                }
-                
-                setTimeout(() => {
-                    Array.from(allCards).forEach(c => {
-                        if(c !== card) {
-                            c.classList.remove('card-hidden');
-                            c.classList.add('flipped');
-                            c.style.opacity = '0.5';
-                        }
-                    });
-                }, 1000);
-                
-                if(!isAdmin) {
-                    setTimeout(() => {
-                        showResultModal(rank, num);
-                    }, 2500);
-                } else {
-                    setTimeout(() => {
-                        document.getElementById('instruction-text').innerText = "시뮬레이션 완료. 다시 테스트하려면 시뮬레이션 버튼을 누르세요.";
-                    }, 2500);
-                }
-            };
-
-            if (rank === 'Fail') {
-                setTimeout(processResult, 600);
-                return;
-            }
-
-            let color = '#777777';
-            if (rank === 'A') color = '#ffcc00';
-            else if (rank === 'B') color = '#a55eea';
-            else if (rank === 'C') color = '#4facfe';
-            
-            const overlay = document.getElementById('magic-circle-overlay');
-            const clickArea = document.getElementById('magic-circle-click');
-            overlay.style.setProperty('--circle-color', color);
-            overlay.style.display = 'flex';
-            
-            let particleInterval;
-            
-            setTimeout(() => {
-                overlay.classList.add('active');
-                particleInterval = setInterval(() => {
-                    for(let i=0; i<3; i++) spawnRandomParticle(clickArea, color);
-                }, 150);
-            }, 100);
-
-            overlay.onclick = () => {
-                overlay.onclick = null;
-                clearInterval(particleInterval);
-                overlay.classList.remove('active');
-                setTimeout(() => { overlay.style.display = 'none'; clickArea.querySelectorAll('div').forEach(el => { if(el.style.position === 'absolute' && !el.className.includes('magic-')) el.remove(); }); }, 500);
-                
-                processResult();
-            };
         }
         function showResultModal(rank, num) {
             let resultMsgHTML = "";
@@ -975,7 +889,7 @@
             if (gateLog) gateLog.innerHTML = logHTML;
         }
 
-        initWinners(); updateUI(); setTimeout(startReversePixelTransition, 100);
+        setTimeout(startReversePixelTransition, 100);
         setTimeout(() => {
             const w = document.getElementById('pixel-reveal-wipe');
             if(w) w.remove();
@@ -985,4 +899,5 @@
 
 </body>
 </html>
+
 
