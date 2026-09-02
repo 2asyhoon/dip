@@ -1,0 +1,748 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dip - 피규어 제작 튜토리얼 3편</title>
+    <style>
+        :root {
+            --primary-color: #ffcc00;
+            --bg-color: #050505;
+            --nav-bg: rgba(15, 15, 15, 0.85);
+            --text-color: #ffffff;
+            --panel-border: rgba(255, 255, 255, 0.1);
+        }
+        body, html {
+            margin: 0; padding: 0; width: 100%; min-height: 100%;
+            background-color: var(--bg-color); color: var(--text-color);
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            overflow-x: hidden; scroll-behavior: smooth;
+        }
+        /* --- 고정 배경 (AI 모드용) --- */
+        .fixed-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-size: cover; background-position: center; z-index: -1;
+            transition: background-image 1.2s ease-in-out;
+        }
+        .fixed-bg::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 5, 0.8); z-index: 0; }
+        /* --- 상단 네비게이션 --- */
+        .header-bar { position: fixed; top: 25px; left: 0; width: 100%; height: 70px; background: transparent; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 2500; transition: background 0.3s; pointer-events: none; }
+.header-box { display: flex; gap: 15px; align-items: center; position: relative; pointer-events: auto; background: rgba(15, 15, 15, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.15); }
+.header-logo { color: #ffcc00; font-size: 20px; font-weight: 900; letter-spacing: 2px; cursor: pointer; text-shadow: 0 2px 10px rgba(0,0,0,0.8); transition: transform 0.2s; }
+.header-logo:hover { transform: scale(1.05); }
+.header-menu { display: flex; gap: 20px; align-items: center; position: relative; }
+.menu-toggle-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+.dropdown-menu { position: absolute; top: 50px; right: 0; background: rgba(15, 15, 15, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 10px 0; width: 130px; display: none; flex-direction: column; z-index: 2600; text-align: center; }
+.dropdown-menu.active { display: flex; }
+.dropdown-item { color: #fff; text-decoration: none; padding: 12px 20px; font-size: 14px; font-weight: bold; }
+.dropdown-item:hover { color: #ffcc00; background: rgba(255,255,255,0.05); }
+.inquiry-btn { background: rgba(255, 255, 255, 0.1); color: #fff; text-decoration: none; font-size: 12px; font-weight: bold; padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.3); transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.inquiry-btn:hover { background: #fff; color: #000; }
+.inquiry-text { display: inline-block; }
+.m-icon { display: none !important; margin: 0; }
+.mode-toggle { display: inline-flex; background: rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 3px; border: 1px solid rgba(255, 255, 255, 0.15); }
+.mode-btn { background: transparent; border: none; color: #aaa; font-weight: bold; font-size: 13px; padding: 5px 15px; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+.mode-btn.active { background: #ffcc00; color: #000; box-shadow: 0 2px 5px rgba(255,204,0,0.3); }
+
+/* --- 레이아웃 공통 --- */
+        .layout-container { display: flex; padding-bottom: 100px; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box; }
+        .content { width: 100%; max-width: 800px; margin: 0 auto; padding: 0 20px; line-height: 1.8; color: #ddd; box-sizing: border-box; }
+        /* --- 스크롤 모드 전용 (이전 모달 클릭 방식) --- */
+        #scrollContent { display: block; }
+        #scrollContent h1 { font-size: 2.2rem; color: #fff; text-align: center; margin-bottom: 20px; }
+        .content .tutorial-section {
+            margin-bottom: 50px; padding: 30px; background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.05); text-align: left;
+        }
+        .content .tutorial-section h2 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px; }
+        .content .tutorial-section p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 15px; word-break: keep-all; color: #ccc; }
+        
+        /* 강조 및 팁 박스 */
+        .highlight { color: var(--primary-color); font-weight: bold; }
+        p.tip-box {
+            background: rgba(255, 204, 0, 0.08); border-left: 4px solid var(--primary-color);
+            padding: 15px 20px; margin: 25px 0; border-radius: 0 8px 8px 0; font-size: 1.05rem; color: #fff;
+            line-height: 1.6;
+        }
+        .fade-in-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+        .data-marker {
+            color: var(--primary-color); cursor: pointer; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; transition: all 0.2s;
+        }
+        .data-marker:hover { color: #000; background: var(--primary-color); text-decoration: none; border-radius: 4px; padding: 0 4px; }
+        /* 이미지 모달 팝업 (스크롤 모드 전용) */
+        .image-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px); flex-direction: column; cursor: pointer; opacity: 0; transition: opacity 0.3s;
+        }
+        .image-modal.active { display: flex; opacity: 1; }
+        .image-modal img { max-width: 90%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 2px solid rgba(255,204,0,0.3); transition: transform 0.3s; }
+        .image-modal img:hover { transform: scale(1.02); }
+        .modal-close-text { color: #fff; margin-top: 20px; font-size: 1rem; opacity: 0.7; }
+        /* --- AI 모드 전용 --- */
+        #aiContent { display: none; width: 100%; max-width: 900px; margin: 0 auto; align-items: stretch; flex-direction: column; padding-bottom: 50px; position: relative; min-height: 60vh; }
+        .ai-mode { overflow: auto; -ms-overflow-style: none; scrollbar-width: none; } /* 스크롤 허용하되 스크롤바 숨김 */
+        .ai-mode::-webkit-scrollbar { display: none; }
+        
+        #aiTextContainer {
+            width: 100%; display: flex; flex-direction: column; align-items: stretch;
+        }
+        
+        .ai-inline-img {
+            max-width: 100%; max-height: 50vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin: 20px auto; object-fit: contain; animation: fadeInImg 0.5s ease-out; display: block;
+        }
+        @keyframes fadeInImg { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .cursor {
+            display: inline-block; width: 8px; height: 1.2rem; background-color: var(--primary-color);
+            margin-left: 4px; vertical-align: middle; animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        /* 안내 문구 전용 스타일 */
+        .ai-notice {
+            color: #aaa; font-size: 1.1rem; text-align: center; margin-bottom: 20px;
+            animation: pulseText 2s infinite alternate;
+        }
+        @keyframes pulseText { 0% { opacity: 0.5; } 100% { opacity: 1; color: var(--primary-color); } }
+        /* --- 우측 네비게이션 바 --- */
+        .right-nav {
+            position: fixed; top: 0; right: 0; width: 300px; height: calc(100vh - 70px);
+            background-color: var(--nav-bg); backdrop-filter: blur(15px); border-left: 1px solid var(--panel-border);
+            padding: 90px 20px 20px 20px; z-index: 100; transition: transform 0.3s ease; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box;
+        }
+        /* 진도율 */
+        .progress-container { background: rgba(255,255,255,0.1); border-radius: 10px; height: 12px; width: 100%; overflow: hidden; position: relative; }
+        .progress-bar { height: 100%; width: 0%; background-color: var(--primary-color); transition: width 0.1s ease; }
+        .progress-text { text-align: right; font-weight: bold; font-size: 0.9rem; color: var(--primary-color); margin-top: 8px; }
+        
+        #volumeSlider { flex: 1; accent-color: var(--primary-color); cursor: pointer; height: 4px; }
+        .playlist-wrapper { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .playlist-wrapper::-webkit-scrollbar { width: 5px; }
+        .playlist-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
+        
+        .playlist { list-style: none; margin: 0; padding: 0; }
+        .playlist li {
+            padding: 10px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;
+            font-size: 0.85rem; cursor: pointer; transition: background 0.2s, color 0.2s; border: 1px solid transparent; display: flex; align-items: center; gap: 10px;
+        }
+        .playlist li:hover { background: rgba(255,255,255,0.1); }
+        .playlist li.active { border-color: var(--primary-color); color: var(--primary-color); font-weight: bold; background: rgba(255, 204, 0, 0.1); }
+        .playing-icon { display: none; font-size: 0.8rem; }
+        .playlist li.active .playing-icon { display: inline-block; animation: pulse 1s infinite alternate; }
+        /* 모바일 토글 버튼 */
+        .mobile-toggle-btn {
+            display: none; position: fixed; right: 20px; bottom: 90px; z-index: 1000; background-color: var(--nav-bg);
+            border: 1px solid var(--primary-color); backdrop-filter: blur(10px); border-radius: 50%;
+            width: 50px; height: 50px; font-size: 0.85rem; font-weight: 900; align-items: center; justify-content: center;
+            color: var(--primary-color); cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        /* --- 하단 네비게이션 바 --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: var(--nav-bg);
+            backdrop-filter: blur(20px); border-top: 1px solid var(--panel-border);
+            display: flex; align-items: center; justify-content: center; z-index: 2000; gap: 40px;
+        }
+        .icon-btn { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, color 0.2s; gap: 5px; font-size: 0.75rem; font-weight: 500; }
+        .icon-btn svg { width: 28px; height: 28px; fill: currentColor; }
+        .icon-btn:hover { color: var(--primary-color); transform: scale(1.1); }
+        
+          .icon-btn:disabled, .icon-btn.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        .speed-indicator { position: relative; }
+        .speed-badge {
+            position: absolute; top: -5px; right: -12px; background: var(--primary-color); color: #000;
+            font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 10px;
+        }
+        /* --- 모바일 중앙 정렬 최적화 --- */
+        @media (max-width: 900px) {
+            .content { padding: 0 10px; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; overflow-x: hidden; }
+            
+            #scrollContent { width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
+            #scrollContent h1 { font-size: 1.8rem; text-align: center; width: 100%; margin-top: 120px; word-break: keep-all; }
+            #scrollContent > p { font-size: 0.9rem !important; padding: 0 15px; word-break: keep-all; text-align: center !important; }
+            
+            .content .tutorial-section {
+                width: 100%; text-align: left; display: flex; flex-direction: column; align-items: stretch; padding: 15px 15px; box-sizing: border-box;
+            }
+            .content .tutorial-section h2 { font-size: 1.4rem; text-align: left; word-break: keep-all; width: 100%; }
+            .content .tutorial-section p { font-size: 0.95rem; text-align: left !important; word-break: keep-all; line-height: 1.6; width: 100%; padding: 0; box-sizing: border-box; }
+            
+            /* 모바일 팁 박스 좌측 정렬 */
+            p.tip-box { margin: 15px 0 !important; width: 100% !important; border-left: 4px solid var(--primary-color) !important; border-top: none !important; border-radius: 0 8px 8px 0 !important; padding: 12px 15px !important; }
+            .ai-inline-img { max-height: 35vh; margin-bottom: 15px; border-radius: 8px; }
+            .ai-notice { margin-top: 140px; padding: 0 10px; word-break: keep-all; }
+            .onboarding-box { padding: 20px; width: 85%; }
+            .onboarding-box h2 { font-size: 1.4rem; }
+            .guide-list { font-size: 0.9rem; }
+            .start-btn { font-size: 1rem; padding: 12px 30px; }
+            .mode-toggle-wrapper { 
+                position: absolute; top: 75px; left: 10px; margin-top: 0; padding: 0; 
+                width: auto; z-index: 100;
+            }
+            .mode-toggle { flex-direction: row; width: auto; border-radius: 20px; }
+            .mode-btn { font-size: 0.8rem; padding: 6px 12px; width: auto; border-radius: 20px; }
+            
+            .mobile-toggle-btn { display: flex; }
+            
+            .right-nav { transform: translateX(100%); height: calc(100vh - 70px); top: 0; padding-top: 90px; z-index: 2000; border-left: none; box-shadow: -5px 0 20px rgba(0,0,0,0.5); }
+            .right-nav.active { transform: translateX(0); }
+                        .header-bar { top: 0; padding: 0 10px; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); pointer-events: auto; }
+            .header-box { background: transparent; border: none; padding: 0 10px; backdrop-filter: none; }
+            .inquiry-text { display: none; }
+            .m-icon { display: inline-block !important; }
+            .inquiry-btn { padding: 8px; border-radius: 50%; width: 35px; height: 35px; }
+            .bottom-nav { gap: 20px; }
+        }
+    </style>
+</head>
+<body class="scroll-mode">
+    <!-- 숨겨진 오디오 플레이어 -->
+    <div class="fixed-bg" id="fixedBg"></div>
+    <header class="header-bar" id="headerBar">
+        <div class="header-box">
+            <div class="header-logo" onclick="location.href='index.html'"><img src="dip.png" alt="dip" style="height: 40px; vertical-align: middle;"></div>
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="btnAiMode">Auto</button>
+                <button class="mode-btn" id="btnScrollMode">Txt</button>
+            </div>
+        </div>
+        <nav class="header-box">
+            <button class="menu-toggle-btn" onclick="toggleDropdown(event)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="index.html" class="dropdown-item">HOME</a>
+                <a href="main.html" class="dropdown-item">TUTORIAL</a>
+                <a href="gatcha.html" class="dropdown-item">PICK UP</a>
+            </div>
+            <a href="https://www.instagram.com/2z._hoon/" target="_blank" class="inquiry-btn">
+                <svg class="m-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none; vertical-align: middle;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                <span class="inquiry-text">&#xBB38;&#xC758;&#xD558;&#xAE30;</span>
+            </a>
+        </nav>
+    </header>
+    <button class="mobile-toggle-btn" id="mobileToggle">0%</button>
+    <div class="layout-container">
+        
+        <!-- 듀얼 모드 스위치 -->
+        
+        <!-- 스크롤 모드 전용 본문 (모달 팝업 형식) -->
+        <main class="content" id="scrollContent">
+            <h1>Ep.03 도색과 완성</h1>
+            <p style="text-align: center; color: #888; margin-bottom: 50px;">강의 내용을 천천히 읽어보세요. 하단의 자동진행 버튼을 누르면 화면이 스크롤됩니다.</p>
+            
+            <div class="tutorial-section fade-in-up">
+                <h2>1. 사포질 (Sanding)</h2>
+                <p>출력물에 남아있는 서포터 자국과 적층 결을 없애기 위해 <span class="highlight">사포질</span>을 진행합니다.</p>
+                <p>전체적인 샌딩보다는 우선 <strong>서포터 자국을 없애는 것에 집중하는 것이</strong> 퀄리티 상승에 도움이 될 수 있습니다.</p>
+                <p>낮은 방수(거친 사포)부터 시작해 높은 방수(고운 사포)로 넘어가며 표면을 부드럽게 만들어줍니다. (예: 400방 -> 600방 -> 800방)</p>
+                <p style="margin-top: 15px;"><span class="data-marker" onclick="showVideo('midi5.mp4')">[영상 가이드]</span></p>
+                <p class="tip-box">
+                    <strong>💡 사포질 팁:</strong> 사포에 물을 묻혀서 사용하는 '물사포질'을 하면 분진이 날리지 않아 건강에 덜 해롭고 사포의 수명도 길어집니다.
+                </p>
+                <p>홈이나 패인 부분에 생긴 기포 자국이나 틈새는 퍼티(Putty)를 채워 넣고 굳힌 뒤 다시 사포질하여 단차를 완벽하게 없앱니다.</p>
+            </div>
+            <div class="tutorial-section fade-in-up">
+                <h2>2. 도색 (Painting)</h2>
+                <p>사포질이 완료된 표면 위에 <span class="highlight">서페이서(프라이머)</span>를 뿌려 도료가 잘 안착할 수 있도록 전처리 작업을 진행해줍니다.</p>
+                <p style="margin-top: 15px;"><span class="data-marker" onclick="showVideo('midi6.mp4')">[영상 자료: 서페이서 작업]</span></p>
+                <p>이후 건조해주고 (최소 2시간 이상 권장), 도료에 레벨링 신너를 1:1 ~ 1:1.5 정도로 섞어 희석해줍니다.</p>
+                <p>사물과 브러쉬의 간격을 8~15cm 정도의 간격으로 분사해 도색해줍니다. 간격이 너무 멀면 분사 중 입자가 굳어 알갱이가 생기고, 너무 가깝다면 도료가 뭉쳐 흘러내릴 수 있습니다. 본인에게 적합한 거리를 경험으로 체득하는 게 좋습니다.</p>
+                <p style="margin-top: 15px;"><span class="data-marker" onclick="showVideo('midi7.mp4')">[영상 자료: 에어브러쉬 도색]</span></p>
+                <p class="tip-box">
+                    <strong>⚠️ 도색 주의 사항:</strong> 도색 시작 시 에어브러쉬에서 뭉친 도료를 뱉어낼 때가 있습니다. 실패를 줄이기 위해 파츠에 칠하기 전 다른 곳에 테스트 분사 후 도색하는 것이 안전합니다.
+                </p>
+            </div>
+            <div class="tutorial-section fade-in-up">
+                <h2>3. 마감 (Finishing)</h2>
+                <p>마감제의 선택은 내가 어떤 분위기의 피규어를 제작 중인지 생각해봐야 합니다.</p>
+                <p>옷이나 천, 피부와 같은 부분은 <span class="highlight">무광</span>, 무기, 금속, 갑옷 같은 부분은 <strong>메탈릭 도료와 유광 마감제</strong> 또는 우레탄 마감제를 이용해 마감해줍니다.</p>
+                <p>베이스와 같은 큰 건축물의 경우 바니쉬를 사용하기도 합니다.</p>
+            </div>
+            <div class="tutorial-section fade-in-up" style="margin-bottom: 200px;">
+                <h2>4. 조립 및 완성 (Assembly)</h2>
+                <p>마감의 건조가 완료되었다면 록타이트(순간접착제)를 사용해 각 파츠를 <span class="highlight">조립</span>해줍니다.</p>
+                <p style="margin-top: 15px;"><span class="data-marker" onclick="showVideo('midi8.mp4')">[영상 자료: 파츠 조립]</span></p>
+                <p class="tip-box" style="margin-top: 0; background: rgba(255, 50, 50, 0.15); border-left-color: #ff4444;">
+                    <strong>⚠️ 주의:</strong> 록타이트가 접합부 밖으로 튀어나가면 백화현상으로 인해 지저분해 보일 수 있으니 주의하셔야 합니다.
+                </p>
+                <p>전부 조립되었다면 완성입니다!</p>
+                <p style="margin-top: 15px;"><span class="data-marker" onclick="showVideo('midi9.mp4')">[영상 자료: 최종 완성]</span></p>
+            </div>
+        </main>
+        <!-- AI 강의 모드 전용 본문 (동적 생성) -->
+        <main class="content" id="aiContent">
+            <div id="countdownOverlay" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; padding: 30px; background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);"><div id="countdownNumber" style="font-size: 3rem; font-weight: 900; color: #ffcc00; margin-bottom: 5px; text-shadow: 0 4px 10px rgba(255,204,0,0.5);">3</div><div style="font-size: 1.3rem; color: #ffcc00; font-weight: bold; margin-bottom: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.5);">Ep.03</div><div style="font-size: 1rem; color: #fff; font-weight: bold;">강의가 시작됩니다</div></div>
+            <div id="aiTextContainer"></div>
+        </main>
+        <!-- 우측 네비게이션 -->
+        <aside class="right-nav" id="rightNav">
+            <div>
+                <h3 style="margin-bottom: 10px; color: #fff;">수강 진도</h3>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% 완료</div>
+            </div>
+                    <div class="toc-section" id="tocSection">
+            <h3 style="margin-bottom: 10px; color: #fff; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px;">Ep.03 목차</h3>
+            <ul id="tocList" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;"></ul>
+        </div>
+    </div>
+        </aside>
+    </div>
+    <!-- 이미지/영상 팝업 모달 (스크롤 모드 전용) -->
+    <div id="imageModal" class="image-modal" onclick="closeImage()">
+        <img id="modalImg" src="" alt="자료 이미지" style="display:none;">
+        <video id="modalVideo" src="" controls style="display:none; max-width:90%; max-height:80vh; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.8); border:2px solid rgba(255,204,0,0.3);"></video>
+        <div class="modal-close-text">화면을 클릭하면 닫힙니다</div>
+    </div>
+    <!-- 하단 네비게이션 -->
+    <nav class="bottom-nav">
+        <!-- Prev --><button class="icon-btn" onclick="location.href='tutorial2.html'"><svg viewBox="0 0 24 24" transform="scale(-1, 1)"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg><span>이전편</span></button>
+        <!-- 재생/일시정지 아이콘 -->
+        <button class="icon-btn" id="autoScrollBtn">
+            <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            <span id="playText">자동진행</span>
+        </button>
+        
+        <!-- 배속 아이콘 -->
+        <button class="icon-btn speed-indicator" id="speedBtn">
+            <svg viewBox="0 0 24 24"><path d="M21.16 7.26l-1.41-1.41-3.56 3.55 1.41 1.41s3.45-3.52 3.56-3.55zM13 2h-2v3h2V2zm9 20v-2H2v2h20zm-8.83-8.88l1.41-1.41-2.12-2.12-1.41 1.41 2.12 2.12zM12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/></svg>
+            <span>배속</span>
+            <div class="speed-badge" id="speedBadge">1.0x</div>
+        </button>
+        <!-- 다음편 비활성화 -->
+        <!-- Next --><button class="icon-btn disabled" disabled><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg><span>다음편</span></button>
+    </nav>
+    <script>
+        // --- 공통 네비게이션 ---
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            dropdownMenu.classList.toggle('active');
+        }
+        window.addEventListener('click', () => {
+            if (dropdownMenu.classList.contains('active')) dropdownMenu.classList.remove('active');
+        });
+        // --- 이미지/영상 팝업 모달 (스크롤 모드 전용) ---
+        const imageModal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalVideo = document.getElementById('modalVideo');
+        
+        function showImage(src) {
+            modalVideo.style.display = 'none';
+            modalVideo.pause();
+            modalImg.src = src;
+            modalImg.style.display = 'block';
+            imageModal.classList.add('active');
+            if(autoScrollActive) toggleAutoScroll(); 
+        }
+        
+        function showVideo(src) {
+            modalImg.style.display = 'none';
+            modalVideo.src = src;
+            modalVideo.style.display = 'block';
+            modalVideo.play();
+            imageModal.classList.add('active');
+            if(autoScrollActive) toggleAutoScroll(); 
+        }
+        function closeImage() {
+            imageModal.classList.remove('active');
+            modalVideo.pause();
+        }
+        // --- 스크롤 모드 옵저버 (페이드인) ---
+        const animObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in-up').forEach(el => animObserver.observe(el));
+        // --- 듀얼 모드 로직 ---
+        const btnScrollMode = document.getElementById('btnScrollMode');
+        const btnAiMode = document.getElementById('btnAiMode');
+        
+        const scrollContent = document.getElementById('scrollContent');
+        const aiContent = document.getElementById('aiContent');
+        const fixedBg = document.getElementById('fixedBg');
+        let currentMode = 'ai'; 
+        // AI 데이터 (VS Code에서 편집한 HTML을 바탕으로 자동 생성)
+        const tutorialData = [];
+        const tutorialSections = scrollContent.querySelectorAll('.tutorial-section');
+        
+        tutorialSections.forEach(sec => {
+            const titleEl = sec.querySelector('h2');
+            const title = titleEl ? titleEl.innerText : '';
+            
+            const paragraphs = [];
+            sec.querySelectorAll('p').forEach(p => {
+                let img = null;
+                const span = p.querySelector('.data-marker');
+                if (span && span.getAttribute('onclick')) {
+                    let match = span.getAttribute('onclick').match(/showImage\('([^']+)'\)/);
+                    if (match) img = match[1];
+                    else {
+                        match = span.getAttribute('onclick').match(/showVideo\('([^']+)'\)/);
+                        if (match) img = match[1];
+                    }
+                }
+                paragraphs.push({ html: p.innerHTML, className: p.className, img: img });
+            });
+            
+            tutorialData.push({ title, paragraphs });
+        });
+        let aiSectionIndex = 0;
+        let typingTimeout;
+        let slideTimeout;
+        let countInterval = null;
+        function initScrollMode() {
+            currentMode = 'scroll';
+            document.body.className = 'scroll-mode';
+            document.body.style.overflow = 'auto'; // 스크롤 허용
+            btnScrollMode.classList.add('active');
+            btnAiMode.classList.remove('active');
+            // clearTimeouts(); removed to allow pause/resume
+            if(autoScrollActive) toggleAutoScroll(); 
+            scrollContent.style.display = 'block';
+            aiContent.style.display = 'none';
+            fixedBg.style.backgroundImage = 'none'; // 스크롤 모드에선 배경 비활성
+        }
+                        let hasStartedAi = false;
+        function initAiMode() {
+            currentMode = 'ai';
+            document.body.className = 'ai-mode';
+            document.body.style.overflow = 'auto';
+            btnScrollMode.classList.remove('active');
+            btnAiMode.classList.add('active');
+            
+            window.scrollTo(0, 0);
+            scrollContent.style.display = 'none';
+            aiContent.style.display = 'flex';
+            fixedBg.style.backgroundImage = 'none';
+            
+            if (!hasStartedAi) {
+                hasStartedAi = true;
+                document.getElementById('aiTextContainer').innerHTML = '';
+                aiSectionIndex = 0;
+                updateProgress(0, tutorialData.length);
+                clearTimeouts();
+                if(autoScrollActive) toggleAutoScroll();
+                startCountdown();
+            }
+        }
+
+        let countdownActive = false;
+        function startCountdown() {
+            if (countdownActive) return;
+            countdownActive = true;
+            const overlay = document.getElementById('countdownOverlay');
+            const numEl = document.getElementById('countdownNumber');
+            overlay.style.display = 'flex';
+            let count = 3;
+            numEl.innerText = count;
+            
+            countInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    numEl.innerText = count;
+                } else {
+                    clearInterval(countInterval);
+                    overlay.style.display = 'none';
+                    countdownActive = false;
+                    startAiLecture();
+                    if(!autoScrollActive) toggleAutoScroll();
+                }
+            }, 1000);
+        }
+                                function clearTimeouts() {
+            clearTimeout(typingTimeout);
+            clearTimeout(slideTimeout);
+            clearInterval(countInterval);
+            typingTimeout = null;
+            slideTimeout = null;
+            countInterval = null;
+            countdownActive = false;
+            document.getElementById('countdownOverlay').style.display = 'none';
+        }
+        function startAiLecture() {
+            renderAiSection();
+        }
+        function renderAiSection() {
+            if (aiSectionIndex >= tutorialData.length) {
+                const endDiv = document.createElement('div');
+                endDiv.className = 'tutorial-section fade-in-up visible';
+                endDiv.innerHTML = '<h2>강의가 모두 끝났습니다!</h2><p>다음 편을 기대해 주세요.</p>';
+                document.getElementById('aiTextContainer').appendChild(endDiv);
+                endDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            const data = tutorialData[aiSectionIndex];
+            const container = document.getElementById('aiTextContainer');
+            
+            const secDiv = document.createElement('div');
+            secDiv.className = 'tutorial-section fade-in-up visible';
+            
+            const h2 = document.createElement('h2');
+            h2.innerHTML = data.title;
+            secDiv.appendChild(h2);
+            container.appendChild(secDiv);
+            
+            secDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            typeParagraphs(data.paragraphs, 0, secDiv);
+            
+            updateProgress(aiSectionIndex, tutorialData.length - 1);
+        }
+        function typeParagraphs(paragraphs, pIndex, secDiv) {
+                        if (pIndex >= paragraphs.length) {
+                let waitTime = 3000;
+                function checkNext() {
+                    if (currentMode !== 'ai' || !autoScrollActive) {
+                        slideTimeout = setTimeout(checkNext, 500);
+                        return;
+                    }
+                    if (waitTime > 0) {
+                        waitTime -= 500;
+                        slideTimeout = setTimeout(checkNext, 500);
+                        return;
+                    }
+                    aiSectionIndex++;
+                    renderAiSection();
+                }
+                slideTimeout = setTimeout(checkNext, 500);
+                return;
+            }
+            const pData = paragraphs[pIndex];
+            if (pData.img) {
+                let mediaEl;
+                if (pData.img.endsWith('.mp4')) {
+                    const vidEl = document.createElement('video');
+                    vidEl.src = pData.img;
+                    vidEl.controls = true;
+                    vidEl.className = 'ai-inline-img fade-in-up visible';
+                    secDiv.appendChild(vidEl);
+                    mediaEl = vidEl;
+                    
+                    vidEl.autoplay = true;
+                    if(autoScrollActive) {
+                        toggleAutoScroll(); // 영상 재생 시 강의 일시 정지
+                        vidEl.onended = () => {
+                            if(!autoScrollActive) toggleAutoScroll(); // 재생 끝나면 강의 재개
+                        };
+                    }
+                } else {
+                    const imgEl = document.createElement('img');
+                    imgEl.src = pData.img;
+                    imgEl.className = 'ai-inline-img fade-in-up visible';
+                    imgEl.alt = '강의 자료';
+                    secDiv.appendChild(imgEl);
+                    mediaEl = imgEl;
+                }
+                
+                mediaEl.addEventListener('loadeddata', () => mediaEl.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+                mediaEl.addEventListener('load', () => mediaEl.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+                mediaEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            const p = document.createElement('p');
+            if (pData.className) p.className = pData.className;
+            secDiv.appendChild(p);
+            typeHtml(pData.html, p, 50, () => {
+                typingTimeout = setTimeout(() => typeParagraphs(paragraphs, pIndex + 1, secDiv), 500 / scrollSpeed);
+            });
+        }
+        function typeHtml(htmlString, element, baseSpeed, onComplete) {
+            element.innerHTML = '';
+            let i = 0;
+            let isTag = false;
+            let text = '';
+            
+                        function type() {
+                if (currentMode !== 'ai' || !autoScrollActive) {
+                    typingTimeout = setTimeout(type, 500);
+                    return;
+                }
+                if (i < htmlString.length) {
+                    let char = htmlString.charAt(i);
+                    text += char;
+                    if (char === '<') isTag = true;
+                    if (char === '>') isTag = false;
+                    
+                    element.innerHTML = text + (isTag ? '' : '<span class="cursor"></span>');
+                    i++;
+                    
+                    element.scrollIntoView({ block: 'center' });
+                    
+                    if (isTag) {
+                        type();
+                    } else {
+                        typingTimeout = setTimeout(type, baseSpeed / scrollSpeed);
+                    }
+                } else {
+                    element.innerHTML = text; // 커서 제거
+                    if (onComplete) onComplete();
+                }
+            }
+            type();
+        }
+        btnScrollMode.addEventListener('click', () => { if(currentMode !== 'scroll') initScrollMode(); });
+        btnAiMode.addEventListener('click', () => { if(currentMode !== 'ai') initAiMode(); });
+        // --- 진도율 ---
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const mobileToggleBtn = document.getElementById('mobileToggle');
+        function updateProgress(current = 0, total = 0) {
+            let percent = 0;
+            if (currentMode === 'scroll') {
+                const docHeight = document.documentElement.scrollHeight;
+                const winHeight = window.innerHeight;
+                percent = docHeight > winHeight ? (window.scrollY / (docHeight - winHeight)) * 100 : 100;
+            } else {
+                percent = total > 0 ? (current / total) * 100 : 100;
+            }
+            const rounded = Math.min(Math.max(Math.round(percent), 0), 100);
+            progressBar.style.width = rounded + '%';
+            progressText.innerText = rounded + '% 완료';
+            mobileToggleBtn.innerText = rounded + '%';
+        }
+        window.addEventListener('scroll', () => {
+            if(currentMode === 'scroll') updateProgress();
+        });
+        // --- 하단 컨트롤 ---
+        const autoScrollBtn = document.getElementById('autoScrollBtn');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const playText = document.getElementById('playText');
+        const speedBtn = document.getElementById('speedBtn');
+        const speedBadge = document.getElementById('speedBadge');
+        
+        let autoScrollActive = false; 
+        let scrollSpeed = 1; 
+        let scrollInterval;
+        function toggleAutoScroll() {
+            autoScrollActive = !autoScrollActive;
+            
+            if (!autoScrollActive) {
+                clearInterval(scrollInterval);
+                playIcon.style.display = 'block'; pauseIcon.style.display = 'none';
+                playText.innerText = '자동진행';
+                autoScrollBtn.classList.remove('active');
+            } else {
+                if (currentMode === 'scroll') {
+                    scrollInterval = setInterval(() => { window.scrollBy(0, 1); }, 20 / scrollSpeed);
+                } else if (currentMode === 'ai') {
+                    // AI 모드 시작 트리거
+                                        if (!countdownActive && !typingTimeout && !slideTimeout) {
+                        if(aiSectionIndex < tutorialData.length - 1) {
+                            aiSectionIndex++;
+                            renderAiSection();
+                        }
+                    }
+                }
+                playIcon.style.display = 'none'; pauseIcon.style.display = 'block';
+                playText.innerText = '일시정지';
+                autoScrollBtn.classList.add('active');
+            }
+        }
+        autoScrollBtn.addEventListener('click', toggleAutoScroll);
+        speedBtn.addEventListener('click', () => {
+            if (scrollSpeed === 1) scrollSpeed = 1.5;
+            else if (scrollSpeed === 1.5) scrollSpeed = 2;
+            else scrollSpeed = 1;
+            
+            speedBadge.innerText = scrollSpeed.toFixed(1) + 'x';
+            speedBtn.classList.add('active');
+            setTimeout(() => speedBtn.classList.remove('active'), 200); 
+            
+            if (autoScrollActive && currentMode === 'scroll') {
+                clearInterval(scrollInterval);
+                scrollInterval = setInterval(() => { window.scrollBy(0, 1); }, 20 / scrollSpeed);
+            }
+        });
+        // 모바일 토글
+        document.getElementById('rightNav');
+        mobileToggleBtn.addEventListener('click', () => {
+            document.getElementById('rightNav').classList.toggle('active');
+        });
+        // --- 초기 모드 및 이벤트 바인딩 완료 후 실행 ---
+                // TOC JS
+        const tocList = document.getElementById('tocList');
+        if (tocList) {
+            tocList.innerHTML = '';
+            tutorialData.forEach((data, index) => {
+                const li = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.style.cssText = "width: 100%; text-align: left; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 0.9rem;";
+                btn.innerText = data.title;
+                btn.onmouseover = () => { btn.style.background = "rgba(255,204,0,0.2)"; btn.style.color = "#ffcc00"; };
+                btn.onmouseout = () => { btn.style.background = "rgba(255,255,255,0.05)"; btn.style.color = "#ccc"; };
+                btn.onclick = () => {
+                                        if (currentMode === 'ai') {
+                        clearTimeouts();
+                        countdownActive = false;
+                        document.getElementById('countdownOverlay').style.display = 'none';
+                        
+                        const container = document.getElementById('aiTextContainer');
+                        container.innerHTML = ''; 
+                        
+                        for(let i = 0; i < index; i++) {
+                            const data = tutorialData[i];
+                            const secDiv = document.createElement('div');
+                            secDiv.className = 'tutorial-section fade-in-up visible';
+                            const h2 = document.createElement('h2');
+                            h2.innerHTML = data.title;
+                            secDiv.appendChild(h2);
+                            
+                            data.paragraphs.forEach(pData => {
+                                if (pData.img) {
+                                    if (pData.img.endsWith('.mp4')) {
+                                        const vidEl = document.createElement('video');
+                                        vidEl.src = pData.img; vidEl.controls = true; vidEl.className = 'ai-inline-img fade-in-up visible';
+                                        secDiv.appendChild(vidEl);
+                                    } else {
+                                        const imgEl = document.createElement('img');
+                                        imgEl.src = pData.img; imgEl.className = 'ai-inline-img fade-in-up visible';
+                                        secDiv.appendChild(imgEl);
+                                    }
+                                }
+                                const p = document.createElement('p');
+                                p.innerHTML = pData.html;
+                                if (pData.className) p.className = pData.className;
+                                secDiv.appendChild(p);
+                            });
+                            container.appendChild(secDiv);
+                        }
+                        
+                        aiSectionIndex = index;
+                        renderAiSection();
+                        if(!autoScrollActive) toggleAutoScroll();
+                    } else {
+                        tutorialSections[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                };
+                li.appendChild(btn);
+                tocList.appendChild(li);
+            });
+        }
+        initAiMode();
+    
+        // 모바일 스와이프 우측 네비게이션바 열고닫기
+        let touchStartX = 0;
+        let touchEndX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (window.innerWidth <= 768) {
+                const diff = touchEndX - touchStartX;
+                const rightNav = document.getElementById('rightNav');
+                if (rightNav) {
+                    if (diff < -50) rightNav.classList.add('active'); // 왼쪽 슬라이드 (열기)
+                    if (diff > 50) rightNav.classList.remove('active'); // 오른쪽 슬라이드 (닫기)
+                }
+            }
+        }, {passive: true});
+    </script>
+</body>
+</html>
