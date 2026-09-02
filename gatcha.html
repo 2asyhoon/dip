@@ -405,13 +405,14 @@
     <div class="modal-overlay" id="admin-modal" style="z-index: 5000;"><div class="panel" style="max-width:320px;"><input type="password" id="admin-pw" style="width:100%; padding:15px; border-radius:10px; border:none; text-align:center; font-size:20px; margin-bottom:15px; color:black;" placeholder="PASSWORD"><button onclick="verifyAdmin()" class="primary-btn">인증</button><button onclick="document.getElementById('admin-modal').style.display='none'" style="width:100%; padding:15px; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">취소</button></div></div>
 
     <script>
-        // 네비게이션 동작
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        function toggleDropdown(event) { event.stopPropagation(); dropdownMenu.classList.toggle('active'); }
-        window.addEventListener('click', () => { if (dropdownMenu.classList.contains('active')) dropdownMenu.classList.remove('active'); });
+        let isDrawing = false;
+        let currentUser = "";
+        let selectedNum = null;
+        let isAdmin = false;
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby801Rwprk3W13F-NhRrgoO4E9FcYfjc3jCKTm1Kw3u5vw7Wh4F2DG-fbS5Ck4JP-OW/exec";
 
-        // 로딩 바
-                function startReversePixelTransition() {
+        // 배경 비디오 및 오디오 재생 처리
+        function startReversePixelTransition() {
             try {
                 const bgVideo = document.getElementById('bg-video');
                 if(bgVideo) bgVideo.play().catch(e => console.log(e));
@@ -430,31 +431,11 @@
                 
                 blocks.sort(() => Math.random() - 0.5);
                 blocks.forEach((b, i) => {
-                    setTimeout(() => {
-                        b.style.opacity = '0';
-                    }, i * 15);
+                    setTimeout(() => { b.style.opacity = '0'; }, i * 15);
                 });
                 
-                setTimeout(() => {
-                    if(wipe.parentNode) wipe.remove();
-                }, 100 * 15 + 200);
-            } catch(e) {
-                console.error("Animation error: ", e);
-                const w = document.getElementById('pixel-reveal-wipe');
-                if(w) w.remove();
-            }
-        }
-
-        let winners = { a: new Set(), b: new Set(), c: new Set() };
-        let currentUser = "";
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby801Rwprk3W13F-NhRrgoO4E9FcYfjc3jCKTm1Kw3u5vw7Wh4F2DG-fbS5Ck4JP-OW/exec"; let selectedNum = null; let isAdmin = false;
-
-        function generateNewWinners() {
-            let nums = Array.from({length: 50}, (_, i) => i + 1).sort(() => Math.random() - 0.5);
-            winners.a = new Set(nums.slice(0, 1)); 
-            winners.b = new Set(nums.slice(1, 4));
-            winners.c = new Set(nums.slice(4, 10));
-            localStorage.setItem('IVIV TOYS_winners', JSON.stringify({ a: Array.from(winners.a), b: Array.from(winners.b), c: Array.from(winners.c) }));
+                setTimeout(() => { wipe.remove(); }, 1500);
+            } catch (e) { console.log(e); }
         }
 
         function enterApp() {
@@ -481,10 +462,10 @@
                 wipe.style.opacity = '0';
                 setTimeout(() => wipe.remove(), 500);
                 
+                document.getElementById('intro-gate').style.display = 'none';
                 document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-screen').style.display = 'block';
+                document.getElementById('main-content').style.display = 'flex';
                 
-                window.globalGachaStatus = data;
                 updateUI(data);
                 setupCards(data.availableNums);
             })
@@ -492,164 +473,8 @@
                 alert("시트 연동 실패: " + e);
                 wipe.remove();
             });
-        })();
-            if(history.some(h => h.user === id)) {
-                alert("이미 픽업에 참여하신 ID입니다! (1인 1회 제한)");
-                return; // 픽업화면 진입 차단
-            }
-            
-            currentUser = id;
-            
-            // 인덱스에서 쓰던 픽셀 애니메이션으로 화면 전환 연출
-            const wipe = document.createElement('div');
-            wipe.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; display:grid; grid-template-columns:repeat(10, 1fr); grid-template-rows:repeat(10, 1fr); pointer-events:none;';
-            document.body.appendChild(wipe);
-            
-            const blocks = [];
-            for (let i = 0; i < 100; i++) {
-                const b = document.createElement('div');
-                b.style.cssText = 'background:#000; width:100%; height:100%; opacity:0; transition:opacity 0.1s;';
-                wipe.appendChild(b);
-                blocks.push(b);
-            }
-            
-            blocks.sort(() => Math.random() - 0.5);
-            blocks.forEach((b, i) => { setTimeout(() => { b.style.opacity = '1'; }, i * 10); });
-            
-            // 화면 가려진 후 전환
-            setTimeout(() => {
-                document.getElementById('intro-gate').style.display = 'none';
-                document.getElementById('main-content').style.display = 'flex';
-                updateUI();
-                setupCards(); // 3장 카드 세팅
-                
-                // 가림막 다시 벗겨내기 (역재생)
-                blocks.forEach((b, i) => { setTimeout(() => { b.style.opacity = '0'; }, i * 15); });
-                setTimeout(() => { wipe.remove(); }, 1500);
-            }, 1200);
         }
 
-        function verifyAdmin() {
-            if(document.getElementById('admin-pw').value === "4444") {
-                isAdmin = true; 
-                currentUser = "ADMIN";
-                document.getElementById('admin-modal').style.display = 'none';
-                document.getElementById('intro-gate').style.display = 'none';
-                document.getElementById('main-content').style.display = 'flex';
-                document.getElementById('admin-controls').style.display = 'flex';
-                updateUI();
-                document.getElementById('instruction-text').innerText = "시뮬레이션 버튼을 눌러주세요.";
-            } else { alert("비밀번호 확인"); }
-        }
-        function testSimulation() {
-            isDrawing = false;
-            document.getElementById('instruction-text').innerText = "한 장을 선택해 주세요.";
-            setupSimulationCards();
-        }
-        
-        function setupSimulationCards() {
-            const cardArea = document.getElementById('card-area');
-            cardArea.innerHTML = '';
-            
-            const ranks = ['A', 'B', 'C', 'Fail'];
-            
-            ranks.forEach((rank, index) => {
-                const card = document.createElement('div');
-                card.className = 'gacha-card deck';
-                card.innerHTML = `
-                    <div class="card-inner">
-                        <div class="card-face card-front"></div>
-                        <div class="card-face card-back rank-${rank}">
-                            ${rank === 'Fail' ? '꽝' : rank + '상'}
-                        </div>
-                    </div>
-                `;
-                // Dummy num 999 for simulation
-                card.onclick = () => selectCard(card, rank, 999, cardArea.children);
-                cardArea.appendChild(card);
-            });
-            
-            setTimeout(() => {
-                const cards = cardArea.children;
-                if(cards.length === 4) {
-                    cards[0].classList.add('card-sim-0');
-                      cards[1].classList.add('card-sim-1');
-                      cards[2].classList.add('card-sim-2');
-                      cards[3].classList.add('card-sim-3');
-                }
-                Array.from(cards).forEach(c => c.classList.remove('deck'));
-            }, 500);
-        }
-        function resetData() { 
-            if(confirm('구글 시트의 모든 데이터를 섞고 초기화하시겠습니까?')) { 
-                document.getElementById('instruction-text').innerText = '초기화 중...';
-                fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'shuffle' }),
-                    headers: { 'Content-Type': 'text/plain' }
-                })
-                .then(r => r.json())
-                .then(data => {
-                    alert('초기화 완료!');
-                    location.reload();
-                })
-                .catch(e => alert('초기화 실패: ' + e));
-            } 
-        }
-        function exitAdmin() { 
-            isAdmin = false; 
-            document.getElementById('admin-controls').style.display = 'none'; 
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('intro-gate').style.display = 'block';
-        }
-
-        // 파티클 생성 함수
-        function emitParticles(x, y, rank) {
-            let amount = 10, color = '#cccccc';
-            if(rank === 'A') { amount = 80; color = '#ffcc00'; }
-            if(rank === 'B') { amount = 50; color = '#a55eea'; }
-            if(rank === 'C') { amount = 30; color = '#4facfe'; }
-            
-            for(let i=0; i<amount; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.backgroundColor = color;
-                p.style.position = 'fixed';
-                p.style.width = '6px';
-                p.style.height = '6px';
-                p.style.left = x + 'px';
-                p.style.top = y + 'px';
-                p.style.zIndex = '9999';
-                document.body.appendChild(p);
-                
-                const angle = Math.random() * Math.PI * 2;
-                const velocity = Math.random() * (rank === 'A' ? 350 : (rank === 'B' ? 250 : (rank === 'C' ? 180 : 80))) + 50;
-                const tx = Math.cos(angle) * velocity;
-                const ty = Math.sin(angle) * velocity;
-                
-                p.animate([
-                    { transform: `translate(0, 0) scale(1)`, opacity: 1 },
-                    { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
-                ], {
-                    duration: Math.random() * 800 + 400,
-                    easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
-                }).onfinish = () => p.remove();
-            }
-        }
-
-        // 이펙트 테스트 (어드민용)
-        function testEffect(rank, event) {
-            if (event) {
-                emitParticles(event.clientX, event.clientY, rank);
-            } else {
-                const cardArea = document.getElementById('card-area');
-                if(!cardArea) return;
-                const rect = cardArea.getBoundingClientRect();
-                emitParticles(rect.left + rect.width/2, rect.top + rect.height/2, rank);
-            }
-        }
-
-        // 3장 카드 세팅
         function setupCards(availableNums) {
             if(!availableNums || availableNums.length < 3) {
                 alert("남은 캡슐이 부족합니다!");
@@ -686,35 +511,59 @@
                 card.onclick = () => selectCard(card, num, document.querySelectorAll('.card'));
             });
         }
+
         function spawnRandomParticle(container, color) {
             const p = document.createElement('div');
-            p.style.position = 'absolute';
-            const size = Math.random() * 8 + 4;
-            p.style.width = size + 'px';
-            p.style.height = size + 'px';
-            p.style.background = '#fff';
-            p.style.borderRadius = '2px';
-            p.style.boxShadow = `0 0 10px 4px ${color}, 0 0 20px #fff`;
-            p.style.top = '50%';
-            p.style.left = '50%';
-            p.style.pointerEvents = 'none';
-            p.style.zIndex = '2100';
-            
+            p.className = 'magic-particle';
+            const size = Math.random() * 6 + 4;
             const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 300 + 100;
+            const distance = Math.random() * 200 + 50; 
             const tx = Math.cos(angle) * distance;
             const ty = Math.sin(angle) * distance;
+            const duration = Math.random() * 1.5 + 1.0;
             
+            p.style.cssText = `
+                position: absolute; width: ${size}px; height: ${size}px;
+                background: ${color}; border-radius: 50%;
+                box-shadow: 0 0 15px ${color}, 0 0 30px ${color};
+                top: 50%; left: 50%; transform: translate(-50%, -50%);
+                pointer-events: none; z-index: 1000; opacity: 1;
+                transition: all ${duration}s cubic-bezier(0.1, 0.8, 0.3, 1);
+            `;
             container.appendChild(p);
             
-            p.animate([
-                { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-                { transform: `translate(calc(-50% + ${tx*0.3}px), calc(-50% + ${ty*0.3}px)) scale(1.5)`, opacity: 1, offset: 0.3 },
-                { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`, opacity: 0 }
-            ], {
-                duration: Math.random() * 2000 + 1000,
-                easing: 'ease-out'
-            }).onfinish = () => p.remove();
+            requestAnimationFrame(() => {
+                p.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`;
+                p.style.opacity = '0';
+            });
+            setTimeout(() => { p.remove(); }, duration * 1000);
+        }
+
+        function emitParticles(x, y, rank) {
+            let amount = 10, color = '#cccccc';
+            if(rank === 'A') { amount = 40; color = 'var(--gold)'; }
+            else if(rank === 'B') { amount = 30; color = 'var(--purple)'; }
+            else if(rank === 'C') { amount = 20; color = 'var(--blue)'; }
+            
+            for(let i=0; i<amount; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle ' + (rank === 'Fail' ? '' : 'particle-' + rank.toLowerCase());
+                const size = Math.random() * 8 + 4;
+                p.style.width = size + 'px'; p.style.height = size + 'px';
+                p.style.left = x + 'px'; p.style.top = y + 'px';
+                if(rank !== 'Fail') p.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
+                document.body.appendChild(p);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 100 + 50;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+                
+                p.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+                ], { duration: 800 + Math.random() * 400, easing: 'cubic-bezier(0, .9, .57, 1)' }).onfinish = () => p.remove();
+            }
         }
 
         function selectCard(card, num, allCards) {
@@ -749,70 +598,75 @@
                 else if(sheetRank === "Purple") rank = 'B';
                 else if(sheetRank === "Blue") rank = 'C';
                 
-                window.globalGachaStatus = res.status;
                 updateUI(res.status);
 
-                card.classList.add('flipped');
-                const rect = card.getBoundingClientRect();
-                emitParticles(rect.left + rect.width/2, rect.top + rect.height/2, rank);
+                const processResult = () => {
+                    card.classList.add('flipped');
+                    const rect = card.getBoundingClientRect();
+                    emitParticles(rect.left + rect.width/2, rect.top + rect.height/2, rank);
+                    
+                    setTimeout(() => {
+                        Array.from(allCards).forEach(c => {
+                            if(c !== card) {
+                                c.classList.remove('card-hidden');
+                                c.classList.add('flipped');
+                                c.style.opacity = '0.5';
+                            }
+                        });
+                    }, 1000);
+                    
+                    setTimeout(() => {
+                        showResultModal(rank, num);
+                    }, 2500);
+                };
+
+                if (rank === 'Fail') {
+                    setTimeout(processResult, 600);
+                    return;
+                }
+
+                let color = '#777777';
+                if (rank === 'A') color = '#ffcc00';
+                else if (rank === 'B') color = '#a55eea';
+                else if (rank === 'C') color = '#4facfe';
+                
+                const overlay = document.getElementById('magic-circle-overlay');
+                const clickArea = document.getElementById('magic-circle-click');
+                overlay.style.setProperty('--circle-color', color);
+                overlay.style.display = 'flex';
+                
+                let particleInterval;
                 
                 setTimeout(() => {
-                    const overlay = document.getElementById('magic-circle-overlay');
+                    overlay.classList.add('active');
+                    particleInterval = setInterval(() => {
+                        for(let i=0; i<3; i++) spawnRandomParticle(clickArea, color);
+                    }, 150);
+                }, 100);
+
+                overlay.onclick = () => {
+                    overlay.onclick = null;
+                    clearInterval(particleInterval);
+                    overlay.classList.remove('active');
+                    setTimeout(() => { overlay.style.display = 'none'; clickArea.querySelectorAll('div').forEach(el => { if(el.style.position === 'absolute' && !el.className.includes('magic-')) el.remove(); }); }, 500);
                     
-                    if(rank === 'Fail') {
-                        overlay.classList.remove('active');
-                        card.style.transform = "translate(-50%, -50%) rotateY(180deg) scale(1.5)";
-                        card.style.zIndex = "1000";
-                        showResultModal(rank, num);
-                    } else {
-                        let cColor = '';
-                        if(rank === 'A') cColor = 'var(--gold)';
-                        else if(rank === 'B') cColor = 'var(--purple)';
-                        else if(rank === 'C') cColor = 'var(--blue)';
-                        
-                        document.documentElement.style.setProperty('--circle-color', cColor);
-                        overlay.classList.add('active');
-                        
-                        card.style.transform = "translate(-50%, -50%) rotateY(0deg) scale(1.5)";
-                        card.style.zIndex = "1000";
-                        
-                        let effectInterval = setInterval(() => {
-                            emitParticles(window.innerWidth/2, window.innerHeight/2, rank);
-                        }, 100);
-                        
-                        let hasClicked = false;
-                        const clickHandler = () => {
-                            if(hasClicked) return;
-                            hasClicked = true;
-                            clearInterval(effectInterval);
-                            document.removeEventListener('click', clickHandler);
-                            document.removeEventListener('touchstart', clickHandler);
-                            
-                            overlay.classList.remove('active');
-                            card.style.transform = "translate(-50%, -50%) rotateY(180deg) scale(1.5)";
-                            showResultModal(rank, num);
-                        };
-                        
-                        setTimeout(() => {
-                            document.addEventListener('click', clickHandler);
-                            document.addEventListener('touchstart', clickHandler);
-                        }, 500);
-                    }
-                }, 600);
+                    processResult();
+                };
             })
             .catch(e => {
                 alert("결과 통신 에러: " + e);
                 location.reload();
             });
         }
+
         function showResultModal(rank, num) {
             let resultMsgHTML = "";
             if (rank === 'A') {
-                resultMsgHTML = `🎉 축하합니다 🎉<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900;">A상</span> 당첨입니다!`;
+                resultMsgHTML = `✨ 축하합니다 ✨<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900;">A상</span> 당첨입니다!`;
             } else if (rank === 'B') {
-                resultMsgHTML = `🎉 축하합니다 🎉<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900;">B상</span> 당첨입니다!`;
+                resultMsgHTML = `✨ 축하합니다 ✨<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900;">B상</span> 당첨입니다!`;
             } else if (rank === 'C') {
-                resultMsgHTML = `🎉 축하합니다 🎉<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900; color:#4facfe;">C상</span> 당첨입니다!`;
+                resultMsgHTML = `✨ 축하합니다 ✨<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900; color:#4facfe;">C상</span> 당첨입니다!`;
             } else {
                 resultMsgHTML = `아쉽게 꽝 이네요...<br><span style="font-size:32px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:36px; font-weight:900; color:#aaa;">꽝</span> 입니다.`;
             }
@@ -828,43 +682,17 @@
         }
 
         function closeResultPopup() {
-            if(isAdmin) {
-                document.getElementById('result-popup').classList.remove('active');
-                setTimeout(() => { document.getElementById('result-popup').style.display = 'none'; }, 500);
-                document.getElementById('instruction-text').innerText = "시뮬레이션 버튼을 다시 누르세요.";
-                document.getElementById('card-area').innerHTML = '';
-                isDrawing = false;
-            } else {
-                location.href = 'index.html';
-            }
+            location.reload();
         }
 
         function saveImg() {
-            html2canvas(document.getElementById('capture-area'), { scale: 2, backgroundColor: null }).then(canvas => {
-                const link = document.createElement('a'); link.download = `IVIV TOYS_RESULT_${selectedNum}.png`; link.href = canvas.toDataURL(); link.click();
-            });
+            alert("이미지 저장은 모바일 기기에서 지원됩니다.");
         }
 
-        // 인스타 공유
         async function shareInsta() {
-            const captureArea = document.getElementById('capture-area');
-            try {
-                const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: null });
-                canvas.toBlob(async (blob) => {
-                    const file = new File([blob], 'IVIV TOYS_gacha.png', { type: 'image/png' });
-                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({ files: [file], title: 'IVIV TOYS GACHA', text: '결과 확인! @IVIV TOYS' });
-                    } else {
-                        alert("이미지 저장 후 인스타그램 스토리에 공유해주세요!");
-                        saveImg();
-                        setTimeout(() => { window.location.href = "instagram://camera"; }, 1000);
-                    }
-                });
-            } catch (err) { alert("공유 오류 발생. 다운로드 기능을 이용해주세요."); }
+            alert("인스타그램 공유는 모바일 기기에서 지원됩니다.");
         }
 
-         
-        // 현황판 UI 업데이트
         function updateUI(status) {
             if(!status) return;
             const counts = status.counts;
@@ -888,16 +716,45 @@
             const gateLog = document.getElementById('gate-log');
             if (gateLog) gateLog.innerHTML = logHTML;
         }
-
+        
+        function resetData() { 
+            if(confirm('구글 시트의 모든 데이터를 섞고 초기화하시겠습니까?')) { 
+                document.getElementById('instruction-text').innerText = "초기화 중...";
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'shuffle' }),
+                    headers: { 'Content-Type': 'text/plain' }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    alert('초기화 완료!');
+                    location.reload();
+                })
+                .catch(e => alert("초기화 실패: " + e));
+            } 
+        }
+        
+        // 초기 로딩 애니메이션
         setTimeout(startReversePixelTransition, 100);
         setTimeout(() => {
             const w = document.getElementById('pixel-reveal-wipe');
             if(w) w.remove();
         }, 2000);
+        
+        // 초기 데이터 로딩 (전광판용)
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'get_status' }),
+            headers: { 'Content-Type': 'text/plain' }
+        }).then(r => r.json()).then(data => {
+            updateUI(data);
+        }).catch(e => console.log(e));
     </script>
 
 
 </body>
 </html>
+
+
 
 
