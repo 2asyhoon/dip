@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -446,7 +446,8 @@
         }
 
         let winners = { a: new Set(), b: new Set(), c: new Set() };
-        let currentUser = ""; let selectedNum = null; let isAdmin = false;
+        let currentUser = "";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby801Rwprk3W13F-NhRrgoO4E9FcYfjc3jCKTm1Kw3u5vw7Wh4F2DG-fbS5Ck4JP-OW/exec"; let selectedNum = null; let isAdmin = false;
 
         function initWinners() {
             try {
@@ -477,8 +478,38 @@
             const id = document.getElementById('user-id').value.trim();
             if(!id) return alert("인스타 ID를 입력하세요!");
             
-            // 중복 참여 확인
-            const history = (function(){ try { let d=JSON.parse(localStorage.getItem('gachaHistory')); return Array.isArray(d) ? d : []; } catch(e) { return []; } })();
+            currentUser = id;
+            
+            const wipe = document.createElement('div');
+            wipe.id = 'loadingWipe';
+            wipe.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999; display:flex; justify-content:center; align-items:center; color:#ffcc00; font-family:"DungGeunMo", sans-serif; font-size:2rem; opacity:0; transition:opacity 0.5s;';
+            wipe.innerText = "데이터 연동 중...";
+            document.body.appendChild(wipe);
+            
+            setTimeout(() => { wipe.style.opacity = '1'; }, 50);
+            
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'get_status' }),
+                headers: { 'Content-Type': 'text/plain' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                wipe.style.opacity = '0';
+                setTimeout(() => wipe.remove(), 500);
+                
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'block';
+                
+                window.globalGachaStatus = data;
+                updateUI(data);
+                setupCards(data.availableNums);
+            })
+            .catch(e => {
+                alert("시트 연동 실패: " + e);
+                wipe.remove();
+            });
+        })();
             if(history.some(h => h.user === id)) {
                 alert("이미 픽업에 참여하신 ID입니다! (1인 1회 제한)");
                 return; // 픽업화면 진입 차단
@@ -566,7 +597,22 @@
                 Array.from(cards).forEach(c => c.classList.remove('deck'));
             }, 500);
         }
-        function resetData() { if(confirm('정말 초기화하시겠습니까?')) { localStorage.removeItem('gachaHistory'); generateNewWinners(); updateUI(); alert('초기화 완료!'); } }
+        function resetData() { 
+            if(confirm('구글 시트의 모든 데이터를 섞고 초기화하시겠습니까?')) { 
+                document.getElementById('instruction-text').innerText = '초기화 중...';
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'shuffle' }),
+                    headers: { 'Content-Type': 'text/plain' }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    alert('초기화 완료!');
+                    location.reload();
+                })
+                .catch(e => alert('초기화 실패: ' + e));
+            } 
+        }
         function exitAdmin() { 
             isAdmin = false; 
             document.getElementById('admin-controls').style.display = 'none'; 
@@ -621,19 +667,13 @@
         }
 
         // 3장 카드 세팅
-        function setupCards() {
-            const history = (function(){ try { let d=JSON.parse(localStorage.getItem('gachaHistory')); return Array.isArray(d) ? d : []; } catch(e) { return []; } })();
-            
-            // 아직 뽑히지 않은 번호 50개 중 추출
-            const allNums = Array.from({length: 50}, (_, i) => i + 1);
-            const remainingNums = allNums.filter(n => !history.some(h => h.num === n));
-            
-            if(remainingNums.length < 3) {
-                alert("재고가 부족합니다!");
+        function setupCards(availableNums) {
+            if(!availableNums || availableNums.length < 3) {
+                alert("남은 캡슐이 부족합니다!");
                 return;
             }
             
-            // 랜덤으로 3개 추출
+            const remainingNums = [...availableNums];
             remainingNums.sort(() => Math.random() - 0.5);
             const selectedThree = remainingNums.slice(0, 3);
             
@@ -642,37 +682,27 @@
             
             selectedThree.forEach((num, index) => {
                 const card = document.createElement('div');
-                card.className = 'gacha-card deck'; // 처음엔 가운데 겹쳐있음
+                card.className = `card card-pos-${index}`;
                 
-                const rank = winners.a.has(num) ? 'A' : (winners.b.has(num) ? 'B' : (winners.c.has(num) ? 'C' : 'Fail'));
+                const inner = document.createElement('div');
+                inner.className = 'card-inner';
                 
-                card.innerHTML = `
-                    <div class="card-inner">
-                        <div class="card-face card-front"></div>
-                        <div class="card-face card-back rank-${rank}">
-                            ${rank === 'Fail' ? '꽝' : rank + '상'}
-                        </div>
-                    </div>
-                `;
+                const front = document.createElement('div');
+                front.className = 'card-front';
+                front.innerHTML = `<img src="c1.png" style="width:100%; height:100%; object-fit:cover;">`;
                 
-                card.onclick = () => selectCard(card, rank, num, cardArea.children);
+                const back = document.createElement('div');
+                back.className = 'card-back';
+                back.innerHTML = `<img src="c2.png" style="width:100%; height:100%; object-fit:cover;">`;
+                
+                inner.appendChild(front);
+                inner.appendChild(back);
+                card.appendChild(inner);
                 cardArea.appendChild(card);
+                
+                card.onclick = () => selectCard(card, num, document.querySelectorAll('.card'));
             });
-            
-            // 0.5초 뒤 카드 스프레드 애니메이션
-            setTimeout(() => {
-                const cards = cardArea.children;
-                if(cards.length === 3) {
-                      cards[0].classList.add('card-pos-0');
-                        cards[1].classList.add('card-pos-1');
-                        cards[2].classList.add('card-pos-2');
-                  }
-                Array.from(cards).forEach(c => c.classList.remove('deck'));
-            }, 500);
         }
-
-        let isDrawing = false;
-        
         function spawnRandomParticle(container, color) {
             const p = document.createElement('div');
             p.style.position = 'absolute';
@@ -704,7 +734,7 @@
             }).onfinish = () => p.remove();
         }
 
-        function selectCard(card, rank, num, allCards) {
+        function selectCard(card, num, allCards) {
             if(isDrawing) return;
             isDrawing = true;
             document.getElementById('instruction-text').innerText = "결과 확인 중...";
@@ -716,6 +746,84 @@
                     c.classList.add('card-hidden');
                 }
             });
+
+            // 서버에 뽑기 요청 전송
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'draw', userId: currentUser, drawNum: num }),
+                headers: { 'Content-Type': 'text/plain' }
+            })
+            .then(r => r.json())
+            .then(res => {
+                if(res.error) {
+                    alert(res.error);
+                    location.reload();
+                    return;
+                }
+                
+                const sheetRank = res.result; // "Gold", "Purple", "Blue", "Lose"
+                let rank = 'Fail';
+                if(sheetRank === 'Gold') rank = 'A';
+                else if(sheetRank === 'Purple') rank = 'B';
+                else if(sheetRank === 'Blue') rank = 'C';
+                
+                // 데이터 업데이트
+                window.globalGachaStatus = res.status;
+                updateUI(res.status);
+
+                card.classList.add('flipped');
+                const rect = card.getBoundingClientRect();
+                emitParticles(rect.left + rect.width/2, rect.top + rect.height/2, rank);
+                
+                setTimeout(() => {
+                    const overlay = document.getElementById('magic-circle-overlay');
+                    
+                    if(rank === 'Fail') {
+                        overlay.classList.remove('active');
+                        card.style.transform = "translate(-50%, -50%) rotateY(180deg) scale(1.5)";
+                        card.style.zIndex = "1000";
+                        showResultPopup(rank, num);
+                    } else {
+                        let cColor = '';
+                        if(rank === 'A') cColor = 'var(--gold)';
+                        else if(rank === 'B') cColor = 'var(--purple)';
+                        else if(rank === 'C') cColor = 'var(--blue)';
+                        
+                        document.documentElement.style.setProperty('--circle-color', cColor);
+                        overlay.classList.add('active');
+                        
+                        card.style.transform = "translate(-50%, -50%) rotateY(0deg) scale(1.5)";
+                        card.style.zIndex = "1000";
+                        
+                        let effectInterval = setInterval(() => {
+                            emitParticles(window.innerWidth/2, window.innerHeight/2, rank);
+                        }, 100);
+                        
+                        let hasClicked = false;
+                        const clickHandler = () => {
+                            if(hasClicked) return;
+                            hasClicked = true;
+                            clearInterval(effectInterval);
+                            document.removeEventListener('click', clickHandler);
+                            document.removeEventListener('touchstart', clickHandler);
+                            
+                            overlay.classList.remove('active');
+                            card.style.transform = "translate(-50%, -50%) rotateY(180deg) scale(1.5)";
+                            showResultPopup(rank, num);
+                        };
+                        
+                        setTimeout(() => {
+                            document.addEventListener('click', clickHandler);
+                            document.addEventListener('touchstart', clickHandler);
+                        }, 500);
+                    }
+                }, 600);
+            })
+            .catch(e => {
+                alert("결과 통신 에러: " + e);
+                location.reload();
+            });
+        });
 
             const processResult = () => {
                 card.classList.add('flipped');
@@ -843,30 +951,26 @@
 
          
         // 현황판 UI 업데이트
-        function updateUI() {
-            const history = (function(){ try { let d=JSON.parse(localStorage.getItem('gachaHistory')); return Array.isArray(d) ? d : []; } catch(e) { return []; } })();
-            const aRem = winners.a.size - history.filter(h => h.prize === "A상").length;
-            const bRem = winners.b.size - history.filter(h => h.prize === "B상").length;
-            const cRem = (winners.c ? winners.c.size : 0) - history.filter(h => h.prize === "C상").length;
+        function updateUI(status) {
+            if(!status) return;
+            const counts = status.counts;
+            const history = status.history;
             
-            // 메인 뽑기창 상단 잔여 수
             const mainA = document.getElementById('main-a');
             const mainB = document.getElementById('main-b');
             const mainC = document.getElementById('main-c');
-            if (mainA) mainA.innerText = Math.max(0, aRem);
-            if (mainB) mainB.innerText = Math.max(0, bRem);
-            if (mainC) mainC.innerText = Math.max(0, cRem);
+            if (mainA) mainA.innerText = Math.max(0, counts.Gold);
+            if (mainB) mainB.innerText = Math.max(0, counts.Purple);
+            if (mainC) mainC.innerText = Math.max(0, counts.Blue);
 
-            // 초기 게이트창 잔여 수
             const gateA = document.getElementById('gate-a');
             const gateB = document.getElementById('gate-b');
             const gateC = document.getElementById('gate-c');
-            if (gateA) gateA.innerText = Math.max(0, aRem);
-            if (gateB) gateB.innerText = Math.max(0, bRem);
-            if (gateC) gateC.innerText = Math.max(0, cRem);
+            if (gateA) gateA.innerText = Math.max(0, counts.Gold);
+            if (gateB) gateB.innerText = Math.max(0, counts.Purple);
+            if (gateC) gateC.innerText = Math.max(0, counts.Blue);
             
-            // 입장창 실시간 로그 현황 업데이트
-            const logHTML = history.map(h => `<div style="padding:4px 0;">@${h.user}: <span style="color:var(--gold)">${h.num}번</span> - ${h.prize}</div>`).join('');
+            const logHTML = history.map(h => `<div style="padding:4px 0;">@${h.user}: <span style="color:var(--gold)">${h.num}번</span> - ${h.prize === 'Lose' ? '꽝' : h.prize}</div>`).join('');
             const gateLog = document.getElementById('gate-log');
             if (gateLog) gateLog.innerHTML = logHTML;
         }
@@ -881,5 +985,4 @@
 
 </body>
 </html>
-
 
