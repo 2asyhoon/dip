@@ -218,7 +218,7 @@
     border-top: 5px solid var(--gold);
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin-bottom: 20px;
+    margin: 0 auto 20px auto;
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
@@ -302,7 +302,7 @@
     </div>
                 <!-- Hero Section -->
         <div class="intro-section" id="hero-section" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; flex-direction: column; align-items: center; margin: 0 auto 20px auto;">
                 <img src="dip.png" alt="dip" style="height: clamp(150px, 30vw, 350px); object-fit: contain; z-index: 2;">
                                 <h2 style="color: #fff; font-size: clamp(1.2rem, 4vw, 2.5rem); margin: 0; font-weight: 900; text-shadow: 0 4px 15px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8); text-align: center; letter-spacing: clamp(1px, 0.5vw, 4px); transform: translateY(clamp(-20px, -5vw, -45px)); z-index: 3;">PICK-UP EVENT</h2>
                 <button onclick="document.getElementById('about-modal').style.display='flex'" style="transform: translateY(clamp(-10px, -2vw, -25px)); width: clamp(200px, 50vw, 280px); padding: 12px 20px; background: transparent; border: 2px solid #fff; border-radius: 30px; color: #fff; font-family: 'Noto Sans KR', sans-serif; font-weight: bold; font-size: clamp(1rem, 2.5vw, 1.3rem); letter-spacing: 2px; cursor: pointer; transition: 0.3s; z-index: 4;" onmouseover="this.style.background='#fff'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='#fff';">이벤트 안내</button>
@@ -335,7 +335,7 @@
 
     <div id="main-content">
         <div class="container-box" style="flex-direction: column; align-items: center;">
-            <div class="panel" style="width: 100%; display: flex; justify-content: space-around; font-weight: bold; font-size: 16px; padding: 15px; margin-bottom: 20px; margin-top: 30px;">
+            <div class="panel" style="width: 100%; display: flex; justify-content: space-around; font-weight: bold; font-size: 16px; padding: 15px; margin: 0 auto 20px auto; margin-top: 30px;">
                 <span>A상 잔여: <b id="main-a" style="color:var(--gold)">0</b></span>
                 <span>B상 잔여: <b id="main-b" style="color:var(--b-rank)">0</b></span>
                 <span>C상 잔여: <b id="main-c" style="color:#4facfe">0</b></span>
@@ -970,6 +970,7 @@
 
 </body>
 </html>
+
 
 
 
