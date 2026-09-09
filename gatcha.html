@@ -412,6 +412,19 @@
     <div class="modal-overlay" id="admin-modal" style="z-index: 5000;"><div class="panel" style="max-width:320px;"><input type="password" id="admin-pw" style="width:100%; padding:15px; border-radius:10px; border:none; text-align:center; font-size:20px; margin-bottom:15px; color:black;" placeholder="PASSWORD"><button onclick="verifyAdmin()" class="primary-btn">인증</button><button onclick="document.getElementById('admin-modal').style.display='none'" style="width:100%; padding:15px; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">취소</button></div></div>
 
     <script>
+                // 모바일 햄버거 메뉴 토글 기능
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            if (dropdownMenu) dropdownMenu.classList.toggle('active');
+        }
+        window.addEventListener('click', () => {
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            if (dropdownMenu && dropdownMenu.classList.contains('active')) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+
         let isDrawing = false;
         let currentUser = "";
         let selectedNum = null;
@@ -957,6 +970,7 @@
 
 </body>
 </html>
+
 
 
 
