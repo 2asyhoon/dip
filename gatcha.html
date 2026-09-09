@@ -200,8 +200,8 @@
         
         #capture-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         .fullscreen-result { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; padding-bottom: 150px; text-align: center; }
-        .fullscreen-result.gold { background: linear-gradient(135deg, #f1c40f, #e67e22, #f1c40f); color: #000; }
-        .fullscreen-result.purple { background: linear-gradient(135deg, #8e44ad, #4a235a, #8e44ad); color: #fff; }
+        .fullscreen-result.gold { background: url('backcard01.png') 45% center / cover no-repeat; color: #fff; }
+        .fullscreen-result.purple { background: url('backcard02.png') 45% center / cover no-repeat; color: #fff; }
         .fullscreen-result.none { background: radial-gradient(circle, #333 0%, #000 100%); color: #fff; }
         
         .res-buttons-wrap { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 10px; z-index: 2; padding: 0 20px; }
@@ -211,7 +211,16 @@
         .pc-only { display: none !important; }
     }
     .win-c { background: #4facfe !important; color: white !important; border: 2px solid #fff !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 10px #4facfe !important; }
-    .fullscreen-result.blue { background: linear-gradient(135deg, rgba(79,172,254,0.9), rgba(0,242,254,0.9)); }
+    .fullscreen-result.blue { background: url('backcard03.png') 45% center / cover no-repeat; color: #fff; }
+.spinner {
+    width: 50px; height: 50px;
+    border: 5px solid rgba(255, 204, 0, 0.3);
+    border-top: 5px solid var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -227,7 +236,7 @@
         <!-- 醫뚯륫 諛뺤뒪: 濡쒓퀬 + ?ㅻ퉬寃뚯씠??踰꾪듉 -->
         <div class="header-box">
             <div class="header-logo" onclick="location.href='index.html'"><img src="dip.png" alt="dip" style="height: 40px; vertical-align: middle;"></div>
-            <nav class="header-links pc-only"><a href="#about-section" class="nav-link" onclick="event.preventDefault(); document.getElementById('about-section').scrollIntoView({behavior:'smooth'})">About</a><a href="#event-section" class="nav-link" onclick="event.preventDefault(); document.getElementById('event-section').scrollIntoView({behavior:'smooth'})">Event</a></nav>
+            <nav class="header-links pc-only"><a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('about-modal').style.display='flex'">About</a><a href="#event-section" class="nav-link" onclick="event.preventDefault(); document.getElementById('event-section').scrollIntoView({behavior:'smooth'})">Event</a></nav>
         </div>
         <!-- ?곗륫 諛뺤뒪: 硫붾돱 ?꾩씠肄?+ 臾몄쓽?섍린 -->
         <nav class="header-box">
@@ -238,70 +247,68 @@
     </header>
 
     <div id="intro-gate">
+        <style>
+        @media (max-width: 768px) {
+            #about-modal {
+                padding: 10px !important;
+                align-items: flex-start !important; /* Push to top to allow margin */
+                padding-top: 90px !important; /* Avoid navbar */
+            }
+            .event-info-card {
+                transform: scale(0.9);
+                max-height: 80vh;
+                overflow-y: auto;
+                width: 95% !important;
+                padding: 20px 15px !important;
+            }
+            .event-info-card::-webkit-scrollbar { display: none; }
+        }
+    </style>
+    <!-- 모달 창 -->
+    <div id="about-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px);">
+        <div class="event-info-card" style="background: rgba(20, 20, 20, 0.95); border: 2px solid var(--gold); border-radius: 20px; padding: clamp(25px, 6vw, 40px) clamp(15px, 5vw, 30px); max-width: 600px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(255, 204, 0, 0.1); position: relative; text-align: center;">
+            <button onclick="document.getElementById('about-modal').style.display='none'" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff; font-size: 30px; cursor: pointer;">&times;</button>
+            <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 4px 15px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; font-weight: 900; letter-spacing: 2px; font-size: clamp(11px, 3vw, 14px);">SPECIAL EVENT</div>
+            <h2 style="color: var(--gold); font-size: clamp(1.4rem, 6vw, 2.2rem); margin: 30px 0 20px 0; font-weight: 900;">이벤트 픽업 안내</h2>
+            <p style="font-size: clamp(13px, 3.8vw, 16px); color: #eaeaea; line-height: 1.6; margin-bottom: 30px;">
+                안녕하세요 <b>dip_tutorial</b>입니다.<br>
+                본 전시를 방문해주신 분들을 위해 준비한<br>소소한 이벤트입니다.<br><br>
+                추첨을 통해 소정의 굿즈를 드립니다. <br><span style="color: #a55eea; font-weight: bold; background: rgba(165,94,234,0.2); padding: 3px 8px; border-radius: 8px; margin-top:5px; display:inline-block;">결과 이미지를 저장해서 DM으로 보내주세요!</span>
+            </p>
+            <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; text-align: left;">
+                <div style="text-align: center; color: #aaa; font-size: 13px; font-weight: bold; margin-bottom: 12px;">- 총 50개 한정 수량 -</div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:10px;">
+                    <span style="color:var(--gold); font-weight:bold;">A상 (금색)</span><span>1개</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:10px;">
+                    <span style="color:var(--purple); font-weight:bold;">B상 (보라색)</span><span>3개</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:10px;">
+                    <span style="color:#4facfe; font-weight:bold;">C상 (파란색)</span><span>6개</span>
+                </div>
+                                <div style="display:flex; justify-content:space-between; color:#888;">
+                    <span>꽝</span><span>40개</span>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255, 107, 107, 0.1); border-left: 4px solid #ff6b6b; padding: clamp(12px, 3vw, 15px) clamp(10px, 3vw, 20px); text-align: left; border-radius: 0 10px 10px 0; margin-top: 20px;">
+                <ul style="margin: 0; padding-left: 20px; color: #ff6b6b; font-size: clamp(11px, 3.5vw, 13px); line-height: 1.6; font-weight: bold; word-break: keep-all;">
+                    <li style="margin-bottom: 5px;">1인당 1회만 참여 가능합니다.</li>
+                    <li style="margin-bottom: 5px;">본 이벤트는 조기 종료될 수 있습니다.</li>
+                    <li>해당 안내는 1회 이벤트로 전시기간내만 진행됩니다.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
                 <!-- Hero Section -->
         <div class="intro-section" id="hero-section" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
             <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
                 <img src="dip.png" alt="dip" style="height: clamp(150px, 30vw, 350px); object-fit: contain; z-index: 2;">
-                <h2 style="color: #fff; font-size: clamp(1.2rem, 4vw, 2.5rem); margin: 0; font-weight: 900; text-shadow: 0 4px 15px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8); text-align: center; letter-spacing: clamp(1px, 0.5vw, 4px); transform: translateY(clamp(-20px, -5vw, -45px)); z-index: 3;">PICK-UP EVENT</h2>
+                                <h2 style="color: #fff; font-size: clamp(1.2rem, 4vw, 2.5rem); margin: 0; font-weight: 900; text-shadow: 0 4px 15px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8); text-align: center; letter-spacing: clamp(1px, 0.5vw, 4px); transform: translateY(clamp(-20px, -5vw, -45px)); z-index: 3;">PICK-UP EVENT</h2>
+                <button onclick="document.getElementById('about-modal').style.display='flex'" style="transform: translateY(clamp(-10px, -2vw, -25px)); width: clamp(200px, 50vw, 280px); padding: 12px 20px; background: transparent; border: 2px solid #fff; border-radius: 30px; color: #fff; font-family: 'Noto Sans KR', sans-serif; font-weight: bold; font-size: clamp(1rem, 2.5vw, 1.3rem); letter-spacing: 2px; cursor: pointer; transition: 0.3s; z-index: 4;" onmouseover="this.style.background='#fff'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='#fff';">이벤트 안내</button>
             </div>
             
-            <div class="scroll-down-hint" onclick="document.getElementById('about-section').scrollIntoView({behavior:'smooth'})">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-            </div>
-        </div>
-
-        <!-- About Section -->
-        <div class="intro-section" id="about-section" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;">
-            <div class="event-info-card" style="background: rgba(20, 20, 20, 0.85); border: 2px solid var(--gold); border-radius: 20px; padding: clamp(25px, 6vw, 40px) clamp(15px, 5vw, 30px); max-width: 600px; width: 92%; box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(255, 204, 0, 0.1); position: relative; overflow: hidden; backdrop-filter: blur(10px); text-align: center; margin: 0 auto;">
-    
-    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 4px 15px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; font-weight: 900; letter-spacing: 2px; font-size: clamp(11px, 3vw, 14px); white-space: nowrap;">SPECIAL EVENT</div>
-
-    <h2 style="color: var(--gold); font-size: clamp(1.4rem, 6vw, 2.2rem); margin: clamp(20px, 5vw, 30px) 0 clamp(15px, 4vw, 20px) 0; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); word-break: keep-all; font-weight: 900;">이벤트 픽업 안내</h2>
-    
-    <p style="font-size: clamp(13px, 3.8vw, 16px); color: #eaeaea; line-height: 1.6; margin-bottom: clamp(20px, 5vw, 30px); word-break: keep-all;">
-        안녕하세요 <b>dip_tutorial</b>입니다.<br>
-        졸업 전시를 방문해주신 분들을 위해 준비한<br>소소한 이벤트입니다.<br><br>
-        픽업 진행 후 <span style="color: #a55eea; font-weight: bold; background: rgba(165,94,234,0.2); padding: 3px 8px; border-radius: 8px; display: inline-block; margin-top: 5px;">@2z._hoon</span>을 태그해서 올려주세요!
-    </p>
-
-    <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: clamp(15px, 4vw, 20px); margin-bottom: clamp(20px, 5vw, 30px); text-align: left; width: 100%;">
-        <div style="text-align: center; color: #aaa; font-size: clamp(11px, 3.5vw, 13px); font-weight: bold; margin-bottom: 12px; letter-spacing: 1px;">- 총 50장 한정 진행 -</div>
-        
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed rgba(255,204,0,0.3); padding-bottom: 12px; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: clamp(8px, 2.5vw, 12px);">
-                <div style="width: 14px; height: 14px; background: var(--gold); box-shadow: inset -2px -2px 0 rgba(0,0,0,0.4), 2px 2px 0 #000; flex-shrink: 0;"></div>
-                <span style="color: #fff; font-weight: bold; font-size: clamp(13px, 4vw, 16px);">황금카드 A상</span>
-            </div>
-            <span style="color: var(--gold); font-weight: 900; font-size: clamp(13px, 4vw, 16px); text-align: right;">1명 (2%)</span>
-        </div>
-        
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed rgba(255,204,0,0.3); padding-bottom: 12px; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: clamp(8px, 2.5vw, 12px);">
-                <div style="width: 14px; height: 14px; background: #a55eea; box-shadow: inset -2px -2px 0 rgba(0,0,0,0.4), 2px 2px 0 #000; flex-shrink: 0;"></div>
-                <span style="color: #fff; font-weight: bold; font-size: clamp(13px, 4vw, 16px);">보라카드 B상</span>
-            </div>
-            <span style="color: #a55eea; font-weight: 900; font-size: clamp(13px, 4vw, 16px); text-align: right;">3명 (6%)</span>
-        </div>
-        
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: clamp(8px, 2.5vw, 12px);">
-                <div style="width: 14px; height: 14px; background: #4facfe; box-shadow: inset -2px -2px 0 rgba(0,0,0,0.4), 2px 2px 0 #000; flex-shrink: 0;"></div>
-                <span style="color: #fff; font-weight: bold; font-size: clamp(13px, 4vw, 16px);">파란카드 C상</span>
-            </div>
-            <span style="color: #4facfe; font-weight: 900; font-size: clamp(13px, 4vw, 16px); text-align: right;">6명 (12%)</span>
-        </div>
-    </div>
-    
-    <div style="background: rgba(255, 107, 107, 0.1); border-left: 4px solid #ff6b6b; padding: clamp(12px, 3vw, 15px) clamp(10px, 3vw, 20px); text-align: left; border-radius: 0 10px 10px 0;">
-        <ul style="margin: 0; padding-left: 20px; color: #ff6b6b; font-size: clamp(11px, 3.5vw, 13px); line-height: 1.6; font-weight: bold; word-break: keep-all;">
-            <li style="margin-bottom: 5px;">1인당 1회만 참여 가능합니다.</li>
-            <li style="margin-bottom: 5px;">부정 이용 적발시 당첨은 취소될 수 있습니다.</li>
-            <li>해당 픽업 1회 이벤트는 전시기간동안만 진행됩니다.</li>
-        </ul>
-    </div>
-</div>
-            
-            <div class="scroll-down-hint" onclick="document.getElementById('event-section').scrollIntoView({behavior:'smooth'})" style="margin-top: 50px;">
+            <div class="scroll-down-hint" onclick="document.getElementById('event-section').scrollIntoView({behavior:'smooth'})">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
             </div>
         </div>
@@ -318,7 +325,7 @@
                 </div>
 
                 <input type="text" id="user-id" style="padding:18px; width:100%; border-radius:15px; border:none; text-align:center; font-size:18px; font-weight:bold; color:black;" placeholder="인스타 아이디 입력">
-                <button onclick="enterApp()" class="primary-btn">픽업</button>
+                <button onclick="enterApp()" class="primary-btn">시작하기</button>
                 <button onclick="document.getElementById('admin-modal').style.display='flex'" class="admin-trigger">ADMIN AUTH</button>
                 
                 
@@ -394,7 +401,7 @@
             <div class="res-buttons-wrap">
                 <div style="display:flex; gap:10px;">
                     <button onclick="saveImg()" style="flex:1; padding:18px; border-radius:15px; border:none; background:white; color:black; font-weight:bold; font-size:15px; cursor:pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">다운로드</button>
-                    <button onclick="shareInsta()" style="flex:1; padding:18px; border-radius:15px; border:none; background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color:white; font-weight:bold; font-size:15px; cursor:pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">인스타 공유</button>
+                    <button onclick="location.href='https://www.instagram.com/2z._hoon/'" style="flex:1; padding:18px; border-radius:15px; border:none; background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color:white; font-weight:bold; font-size:15px; cursor:pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">공유하기</button>
                 </div>
                 <button onclick="location.reload()" style="width:100%; padding:18px; border-radius:15px; border:none; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); color:white; font-weight:bold; font-size:15px; border: 1px solid rgba(255,255,255,0.2); cursor:pointer;">처음으로 돌아가기</button>
             </div>
@@ -452,7 +459,7 @@
             const wipe = document.createElement('div');
             wipe.id = 'loadingWipe';
             wipe.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999; display:flex; justify-content:center; align-items:center; color:#ffcc00; font-family:"DungGeunMo", sans-serif; font-size:2rem; opacity:0; transition:opacity 0.5s;';
-            wipe.innerText = "Loading...";
+            wipe.innerHTML = "<div style=\"text-align:center;\"><div class=\"spinner\"></div><div>데이터 연동 중...</div></div>";
             document.body.appendChild(wipe);
             
             setTimeout(() => { wipe.style.opacity = '1'; }, 50);
@@ -518,7 +525,6 @@
                 const card = document.createElement('div');
                 card.className = 'gacha-card deck';
                 
-                // 임시로 뒷면을 렌더링해둡니다. 클릭 시 서버 요청 없이 테스트용으로 뒤집힙니다.
                 card.innerHTML = `
                     <div class="card-inner">
                         <div class="card-face card-front"></div>
@@ -560,7 +566,6 @@
                 const card = document.createElement('div');
                 card.className = 'gacha-card deck'; 
                 
-                // 뒷면은 결과를 받기 전이므로 비워둡니다 (클릭 시점에 서버에서 받아서 채움)
                 card.innerHTML = `
                     <div class="card-inner">
                         <div class="card-face card-front"></div>
@@ -670,11 +675,15 @@
                 else if(sheetRank === "Purple") rank = 'B';
                 else if(sheetRank === "Blue") rank = 'C';
                 
-                // 카드 뒷면 내용 채우기
+                const imgMap = { 'A': 'card01.png', 'B': 'card02.png', 'C': 'card03.png' };
                 const cardBack = document.getElementById(`card-back-${num}`);
                 if(cardBack) {
                     cardBack.className = `card-face card-back rank-${rank}`;
-                    cardBack.innerHTML = rank === 'Fail' ? '꽝' : rank + '상';
+                    if(rank === 'Fail') {
+                        cardBack.innerHTML = '꽝';
+                    } else {
+                        cardBack.innerHTML = `<img src="${imgMap[rank]}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`;
+                    }
                 }
                 
                 updateUI(res.status);
@@ -683,16 +692,6 @@
                     card.classList.add('flipped');
                     const rect = card.getBoundingClientRect();
                     emitParticles(rect.left + rect.width/2, rect.top + rect.height/2, rank);
-                    
-                    setTimeout(() => {
-                        Array.from(allCards).forEach(c => {
-                            if(c !== card) {
-                                c.classList.remove('card-hidden');
-                                c.classList.add('flipped');
-                                c.style.opacity = '0.5';
-                            }
-                        });
-                    }, 1000);
                     
                     setTimeout(() => {
                         showResultModal(rank, num);
@@ -738,7 +737,6 @@
             });
         }
         
-        // 관리자 테스트용 selectCard (시트 연동 안함)
         function selectCardSim(card, rank, num, allCards) {
             if(isDrawing) return;
             isDrawing = true;
@@ -753,20 +751,21 @@
                 }
             });
 
+            const imgMap = { 'A': 'card01.png', 'B': 'card02.png', 'C': 'card03.png' };
+            const cardBack = card.querySelector('.card-back');
+            if(cardBack) {
+                cardBack.className = `card-face card-back rank-${rank}`;
+                if(rank === 'Fail') {
+                    cardBack.innerHTML = '꽝';
+                } else {
+                    cardBack.innerHTML = `<img src="${imgMap[rank]}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`;
+                }
+            }
+
             const processResult = () => {
                 card.classList.add('flipped');
                 const rect = card.getBoundingClientRect();
                 emitParticles(rect.left + rect.width/2, rect.top + rect.height/2, rank);
-                
-                setTimeout(() => {
-                    Array.from(allCards).forEach(c => {
-                        if(c !== card) {
-                            c.classList.remove('card-hidden');
-                            c.classList.add('flipped');
-                            c.style.opacity = '0.5';
-                        }
-                    });
-                }, 1000);
                 
                 setTimeout(() => {
                     showResultModal(rank, num);
@@ -808,24 +807,81 @@
 
         function showResultModal(rank, num) {
             let resultMsgHTML = "";
-            if (rank === 'A') {
-                resultMsgHTML = `✨ 축하합니다 ✨<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900;">A상</span> 당첨입니다!`;
-            } else if (rank === 'B') {
-                resultMsgHTML = `✨ 축하합니다 ✨<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900;">B상</span> 당첨입니다!`;
-            } else if (rank === 'C') {
-                resultMsgHTML = `✨ 축하합니다 ✨<br><span style="font-size:36px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:46px; font-weight:900; color:#4facfe;">C상</span> 당첨입니다!`;
+            let rankStr = rank === 'Fail' ? '꽝' : rank + '상';
+            
+            if (rank === 'Fail') {
+                resultMsgHTML = `
+                    <div style="font-size:16px; margin-bottom:10px; color:#ccc;">다음 기회에...</div>
+                    <div style="font-size:32px; font-weight:900; line-height:1.4;">
+                        @${currentUser}님<br>
+                        <span style="color:#aaa;">${rankStr}</span> 입니다.
+                    </div>
+                `;
             } else {
-                resultMsgHTML = `아쉽게 꽝 이네요...<br><span style="font-size:32px; color:#fff;">@${currentUser}</span> 님<br><span style="font-size:36px; font-weight:900; color:#aaa;">꽝</span> 입니다.`;
+                resultMsgHTML = `
+                    <div style="font-size:16px; margin-bottom:10px; opacity:0.9;">이미지를 저장하신 후 DM으로 보내주세요</div>
+                    <div style="font-size:32px; font-weight:900; line-height:1.4;">
+                        @${currentUser}님<br>
+                        <span style="font-size:42px;">${rankStr}</span><br>
+                        축하드립니다!
+                    </div>
+                `;
             }
             
             document.getElementById('res-screen').className = 'fullscreen-result ' + (rank === 'A' ? 'gold' : (rank === 'B' ? 'purple' : (rank === 'C' ? 'blue' : 'none')));
             document.getElementById('res-msg').innerHTML = resultMsgHTML;
-            document.getElementById('res-num').innerText = "Card " + num.toString().padStart(2, '0');
+            document.getElementById('res-num').innerText = "";
             
             const popup = document.getElementById('result-popup');
             popup.style.display = 'block';
             void popup.offsetWidth;
             popup.classList.add('active');
+        }
+
+                function saveImg() {
+            const resScreen = document.getElementById('res-screen');
+            let currentRank = 'Fail';
+            if(resScreen.classList.contains('gold')) currentRank = 'A';
+            else if(resScreen.classList.contains('purple')) currentRank = 'B';
+            else if(resScreen.classList.contains('blue')) currentRank = 'C';
+
+            if(currentRank === 'Fail') {
+                alert("꽝은 이미지를 다운로드할 수 없습니다.");
+                return;
+            }
+            
+            const imgMap = { 'A': 'card01.png', 'B': 'card02.png', 'C': 'card03.png' };
+            const imgSrc = imgMap[currentRank];
+            
+            const img = new Image();
+            
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                ctx.font = "bold 50px 'Noto Sans KR', sans-serif";
+                ctx.fillStyle = "#ffffff";
+                ctx.textAlign = "center";
+                ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
+                
+                const text = "@" + currentUser;
+                ctx.fillText(text, canvas.width / 2, canvas.height - 60);
+                
+                const link = document.createElement('a');
+                link.download = 'IVIV_TOYS_' + currentRank + '상_' + currentUser + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+            img.onerror = function() {
+                alert("이미지를 불러오는데 실패했습니다.");
+            };
+            img.src = imgSrc;
         }
 
         function closeResultPopup() {
@@ -837,29 +893,6 @@
             } else {
                 location.reload();
             }
-        }
-
-        function saveImg() {
-            html2canvas(document.getElementById('capture-area'), { scale: 2, backgroundColor: null }).then(canvas => {
-                const link = document.createElement('a'); link.download = `IVIV TOYS_RESULT_${selectedNum}.png`; link.href = canvas.toDataURL(); link.click();
-            });
-        }
-
-        async function shareInsta() {
-            const captureArea = document.getElementById('capture-area');
-            try {
-                const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: null });
-                canvas.toBlob(async (blob) => {
-                    const file = new File([blob], 'IVIV TOYS_gacha.png', { type: 'image/png' });
-                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({ files: [file], title: 'IVIV TOYS GACHA', text: '당첨 확인! @IVIV TOYS' });
-                    } else {
-                        alert("이미지 저장 후 인스타그램 스토리에 공유해주세요!");
-                        saveImg();
-                        setTimeout(() => { window.location.href = "instagram://camera"; }, 1000);
-                    }
-                });
-            } catch (err) { alert("캡처 중 오류 발생. 다운로드 버튼을 이용해주세요."); }
         }
 
         function updateUI(status) {
@@ -910,6 +943,7 @@
             if(w) w.remove();
         }, 2000);
         
+        document.getElementById('about-modal').style.display='flex';
         // 초기 데이터 로딩 (전광판용)
         fetch(WEB_APP_URL, {
             method: 'POST',
