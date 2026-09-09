@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -42,7 +42,7 @@
         #fullPage::-webkit-scrollbar { display: none; }
         .section {
             width: 100vw; height: 100vh;
-            scroll-snap-align: start; scroll-snap-stop: always;
+             scroll-snap-stop: always;
             position: relative;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
@@ -187,199 +187,10 @@
         .close-modal-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; z-index: 20; text-shadow: 0 2px 5px rgba(0,0,0,0.5); padding: 0; }
         .close-modal-btn:hover { color: #ffcc00; }
         
+                /* ---------------- ? 반응??(모바??최적?? ---------------- */
         @media (max-width: 768px) {
-            .insta-modal-content { flex-direction: column; height: 90vh; overflow-y: auto; }
-            .insta-modal-left { flex: none; height: 40vh; }
-            .insta-modal-right { flex: none; border-left: none; border-top: 1px solid #333; }
-        }
-        /* ---------------- Section 4 : Promo Banner & Pixel Gacha Machine ---------------- */
-        .sec04 { 
-            background: #050505; 
-            align-items: center; justify-content: center; text-align: center; 
-            padding: 100px 0;
-            margin-top: 0; position: relative; overflow: hidden;
-        }
-        
-        .pixel-gacha-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1; pointer-events: none;
-        }
-        .pixel-capsule {
-            position: absolute; top: -50px;
-            width: 5px; height: 5px;
-            background: transparent;
-            box-shadow: 
-                10px 0 var(--c), 15px 0 var(--c), 20px 0 var(--c), 25px 0 var(--c),
-                5px 5px var(--c), 10px 5px var(--c), 15px 5px var(--c), 20px 5px var(--c), 25px 5px var(--c), 30px 5px var(--c),
-                5px 10px var(--c), 10px 10px var(--c), 15px 10px var(--c), 20px 10px var(--c), 25px 10px var(--c), 30px 10px var(--c),
-                10px 15px var(--c), 15px 15px var(--c), 20px 15px var(--c), 25px 15px var(--c),
-                
-                10px 20px #e0e0e0, 15px 20px #e0e0e0, 20px 20px #e0e0e0, 25px 20px #e0e0e0,
-                5px 25px #e0e0e0, 10px 25px #e0e0e0, 15px 25px #e0e0e0, 20px 25px #e0e0e0, 25px 25px #e0e0e0, 30px 25px #e0e0e0,
-                5px 30px #e0e0e0, 10px 30px #e0e0e0, 15px 30px #e0e0e0, 20px 30px #e0e0e0, 25px 30px #e0e0e0, 30px 30px #e0e0e0,
-                10px 35px #e0e0e0, 15px 35px #e0e0e0, 20px 35px #e0e0e0, 25px 35px #e0e0e0;
-            animation: fall linear infinite;
-            border-radius: 2px;
-        }
-        @keyframes fall {
-            0% { transform: translateY(-100px) rotate(0deg) scale(var(--s)); opacity: 1; }
-            80% { opacity: 1; }
-            100% { transform: translateY(110vh) rotate(180deg) scale(var(--s)); opacity: 0; }
-        }
-
-        .gacha-machine-wrapper {
-            position: relative; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%;
-        }
-        
-        .pixel-gacha-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden;
-            pointer-events: none;
-        }
-        /* True 8-bit Box-Shadow Pixel Art Capsule (Half-white Pokeball Style, Thin Equator) */
-        .retro-capsule {
-            width: 1em; height: 1em; background: transparent; position: absolute;
-            transform-origin: 4em 3em; /* Center of the pixel art for correct physics rotation */
-            box-shadow:
-                /* Top Half */
-                3em 0 0 #000, 4em 0 0 #000, 5em 0 0 #000,
-                2em 1em 0 #000, 3em 1em 0 #fff, 4em 1em 0 #f0f0f0, 5em 1em 0 #ccc, 6em 1em 0 #000,
-                1em 2em 0 #000, 2em 2em 0 #fff, 3em 2em 0 #f0f0f0, 4em 2em 0 #f0f0f0, 5em 2em 0 #ccc, 6em 2em 0 #999, 7em 2em 0 #000,
-                /* Bottom Half (Drawn ON TOP of Middle Line to make it half thickness) */
-                1em 3.5em 0 #000, 2em 3.5em 0 var(--h, var(--c)), 3em 3.5em 0 var(--c), 4em 3.5em 0 var(--c), 5em 3.5em 0 var(--d, var(--c)), 6em 3.5em 0 var(--d, var(--c)), 7em 3.5em 0 #000,
-                2em 4.5em 0 #000, 3em 4.5em 0 var(--c), 4em 4.5em 0 var(--d, var(--c)), 5em 4.5em 0 var(--d, var(--c)), 6em 4.5em 0 #000,
-                3em 5.5em 0 #000, 4em 5.5em 0 #000, 5em 5.5em 0 #000,
-                /* Middle Line (Drawn BEHIND Bottom Half) */
-                1em 3em 0 #000, 2em 3em 0 #000, 3em 3em 0 #000, 4em 3em 0 #000, 5em 3em 0 #000, 6em 3em 0 #000, 7em 3em 0 #000;
-        }
-
-        .pixel-capsule {
-            font-size: calc(6px * var(--s)); /* Scale using font-size for ems */
-            top: -350px; animation: pixelFall linear infinite; opacity: 0.9;
-        }
-        @keyframes pixelFall {
-            to { transform: translateY(110vh) rotate(360deg); }
-        }
-
-        .immersive-machine {
-            position: relative; width: 100%; min-height: 100vh; overflow: hidden;
-            background: #111; /* Dark arcade background */
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
-
-        .immersive-promo {
-            text-align: center; margin-top: 100px; position: relative; z-index: 10;
-        }
-        .immersive-promo h2 {
-            font-family: 'DungGeunMo', sans-serif;
-            font-size: 5rem; color: #ffcc00; margin-bottom: 10px;
-            text-shadow: 4px 4px 0 #222, 6px 6px 0 #000; /* Blocky retro shadow */
-        }
-        .immersive-promo p {
-            font-family: 'DungGeunMo', sans-serif;
-            font-size: 1.8rem; color: #fff; line-height: 1.4;
-            text-shadow: 2px 2px 0 #222;
-        }
-
-
-
-        .immersive-floor {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 180px;
-            background: #222; border-top: 8px solid #444;
-            box-shadow: inset 0 20px 0 #111;
-            display: flex; justify-content: center; align-items: center; gap: 80px; z-index: 20;
-        }
-
-        .coin-display-huge {
-            display: flex; align-items: center; gap: 15px; color: #fff;
-            background: #000; padding: 15px 30px; border: 6px solid #444; border-radius: 0;
-            box-shadow: 8px 8px 0 #000;
-            font-family: 'DungGeunMo', sans-serif;
-        }
-        .coin-display-huge .coin-text { font-size: 2.2rem; text-shadow: 2px 2px 0 #222; }
-        .coin-display-huge .coin-number {
-            background: #222; color: #ffcc00; padding: 5px 15px; border: 4px solid #111; border-radius: 0;
-            font-size: 3.5rem; font-family: 'DS-Digital', sans-serif;
-            text-shadow: 0 0 10px #ffcc00; letter-spacing: 2px;
-            box-shadow: inset -4px -4px 0 #000; text-align: center;
-        }
-
-        .lever-wrapper {
-            position: relative; z-index: 2; 
-            display: flex; justify-content: center; align-items: center;
-        }
-        .lever-base {
-            width: 100px; height: 100px;
-            background: #444; border-radius: 50%;
-            border: 8px solid #222;
-            box-shadow: inset 0 10px 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.5);
-            display: flex; justify-content: center; align-items: center;
-        }
-        .lever-handle {
-            width: 70px; height: 20px;
-            cursor: pointer; position: relative;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-origin: center center;
-            background: #ffcc00; border: 4px solid #000; border-radius: 10px;
-            box-shadow: inset -3px -3px 0 #cc9900, inset 3px 3px 0 #fff;
-        }
-        .lever-handle:hover {
-            transform: rotate(25deg);
-        }
-        .floor-side {
-            flex: 1; display: flex; align-items: center;
-        }
-
-        .immersive-exit-hole {
-            width: 250px; height: 120px; background: #000; border: 8px solid #444; border-radius: 0;
-            box-shadow: inset 0 25px 0 rgba(255,255,255,0.05), 8px 8px 0 #000; position: relative; overflow: hidden;
-            z-index: 1;
-        }
-
-        /* Dispensed retro capsule */
-        .immersive-exit-hole .gacha-dispensed {
-            font-size: 15px; /* makes it 105x105 */
-            top: -140px; left: 65px; 
-            z-index: 10; display: none;
-        }
-        .immersive-exit-hole .gacha-dispensed.drop {
-            display: block; animation: dropCapsuleHuge 1.2s forwards;
-        }
-        @keyframes dropCapsuleHuge {
-            0% { top: -140px; transform: scale(0.8) rotate(0deg); opacity: 0; animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
-            15% { opacity: 1; }
-            35% { top: 20px; transform: scale(1) rotate(90deg); animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-            55% { top: -10px; transform: scale(1) rotate(135deg); animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
-            75% { top: 20px; transform: scale(1) rotate(180deg); animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-            90% { top: 10px; transform: scale(1) rotate(200deg); animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
-            100% { top: 20px; transform: scale(1) rotate(220deg); }
-        }
-
-        @media (max-width: 1024px) {
-            .immersive-promo h2 { font-size: 3rem; }
-            .immersive-floor { flex-direction: column; height: auto; padding: 30px 0; gap: 20px; }
-            .immersive-capsules { bottom: 350px; }
-            .immersive-capsules .inner-cap { width: 80px; height: 80px; }
-            .btn-grab-huge { width: 200px; height: 60px; font-size: 1.8rem; }
-            .immersive-exit-hole { width: 200px; height: 100px; }
-            .immersive-exit-hole .gacha-dispensed { width: 80px; height: 80px; left: 52px; top: -120px; }
-            .coin-display-huge { padding: 10px 20px; }
-            .coin-display-huge .coin-text { font-size: 1.2rem; }
-            .coin-display-huge .coin-number { font-size: 1.5rem; }
-        }
-
-        @keyframes bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -5px); } }
-
-        .promo-content { position: relative; z-index: 10; padding: 20px; width: 90%; max-width: 800px; text-align: center; }
-        /* ---------------- Section 5 : Footer ---------------- */
-        .sec05 { background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .footer-content { width: 80%; max-width: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 50px; margin: 0 auto; }
-        .f-left h2 { font-size: 2rem; font-weight: 900; margin: 0 0 20px 0; color: #ffcc00; }
-        .f-left p { color: #666; font-size: 0.9rem; line-height: 1.8; margin: 5px 0; }
-        
-        /* ---------------- ?벑 諛섏쓳??(紐⑤컮??理쒖쟻?? ---------------- */
-        @media (max-width: 768px) {
-            body, html { overflow: auto; }
-            #fullPage { height: auto; overflow-y: visible; scroll-snap-type: none; }
+            body, html { overflow: auto; scroll-snap-type: none !important; }
+            #fullPage { height: auto; overflow-y: visible; scroll-snap-type: none !important; }
             
             /* 紐⑤뱺 ?뱀뀡?ㅼ씠 媛뺤젣 100vh媛 ?꾨땶 ?댁슜臾쇱뿉 留욎떠吏硫댁꽌 以묒븰 ?뺣젹 ?좎? */
             .section { 
@@ -393,8 +204,8 @@
             .sec01 { padding: 0; }
             
             /* ?ㅻ뜑 硫붾돱 ?꾩튂 ?듭씪 */
-            .header-bar { top: 0; padding: 0 10px; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); pointer-events: auto; }
-            .header-box { background: transparent; border: none; padding: 0 10px; backdrop-filter: none; }
+            
+            
             .pc-only { display: none !important; }
             .dropdown-menu { right: 0px; top: 50px; }
             /* ?고듃 ?ш린 議곗젅 */
@@ -463,7 +274,7 @@
     <div id="fullPage">
         
         <!-- Section 1 : 硫붿씤 ?명듃濡?-->
-        <div class="section sec01" style="height: 200vh; display: block; scroll-snap-align: start; padding: 0; overflow: visible;">
+        <div class="section sec01" style="height: 200vh; display: block;  padding: 0; overflow: visible;">
             <div class="sec01-bg" style="position: sticky; top: 0; height: 100vh; z-index: 1; width: 100%; overflow: hidden;">
                 <video class="sec01-video" autoplay loop muted playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4;">
                     <source src="homeback.mp4" type="video/mp4">
@@ -518,7 +329,7 @@
                 </div>
             </div>
             <!-- Dummy Snap Point for 2nd stage of scroll -->
-            <div style="position: absolute; top: 100vh; width: 100%; height: 1px; scroll-snap-align: start; pointer-events: none;"></div>
+            <div style="position: absolute; top: 100vh; width: 100%; height: 1px;  pointer-events: none;"></div>
         </div>
         <!-- Section 2 : ?뱀궗?댄듃 ?뚭컻 -->
         <div class="section sec02" id="aboutSection" style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #050505; position: relative; padding: 0;">
@@ -633,7 +444,7 @@
                 </style>
 
                 <div class="toc-box-container">
-                    <div class="toc-flip-container aos-up delay-1" ontouchstart="this.classList.toggle('touch-hover');">
+                    <div class="toc-flip-container aos-up delay-1" onclick="this.classList.toggle('touch-hover');">
                         <div class="toc-flipper">
                             <div class="toc-front">
                                 <h3>Ep.1</h3>
@@ -647,7 +458,7 @@
                         </div>
                     </div>
                     
-                    <div class="toc-flip-container aos-up delay-2" ontouchstart="this.classList.toggle('touch-hover');">
+                    <div class="toc-flip-container aos-up delay-2" onclick="this.classList.toggle('touch-hover');">
                         <div class="toc-flipper">
                             <div class="toc-front">
                                 <h3>Ep.2</h3>
@@ -661,7 +472,7 @@
                         </div>
                     </div>
                     
-                    <div class="toc-flip-container aos-up delay-3" ontouchstart="this.classList.toggle('touch-hover');">
+                    <div class="toc-flip-container aos-up delay-3" onclick="this.classList.toggle('touch-hover');">
                         <div class="toc-flipper">
                             <div class="toc-front">
                                 <h3>Ep.3</h3>
@@ -710,153 +521,86 @@
         </div>
         <!-- Section 4 : Promo Banner & Gacha Machine -->
         <!-- Section 4 : Pixel Art Event -->
-        <div class="section sec04" id="eventSection" style="height: 100vh; background: #000; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;">
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-                
-                .pixel-art-wrapper {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    width: 140vw; /* Middle ground zoom */
-                    min-width: 1200px;
-                    max-width: 1920px;
-                    z-index: 5;
-                }
-                
-                .pixel-art-wrapper::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 1; pointer-events: none; }
-                .pixel-img {
-                    width: 100%;
-                    height: auto;
-                    display: block;
-                    image-rendering: pixelated;
-                }
-                
-                .pixel-signboard {
-                    position: absolute;
-                    top: 40%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: #fff;
-                    font-size: clamp(1.8rem, 6vw, 4.5rem);
-                    text-transform: uppercase;
-                    z-index: 10;
-                    font-family: 'Press Start 2P', monospace;
-                    text-align: center;
-                    width: 90%;
-                    word-break: keep-all;
-                    text-shadow: 4px 4px 0 #000, 0 5px 25px rgba(0,0,0,1);
-                }
-                
-                .pixel-btn {
-                    position: absolute;
-                    bottom: 15%; /* ?щ젮以?*/
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: #ffcc00;
-                    border: 4px solid #fff;
-                    color: #000;
-                    padding: 20px 50px;
-                    font-size: 2rem;
-                    text-decoration: none;
-                    text-transform: uppercase;
-                    box-shadow: inset -4px -4px 0px 0px rgba(0,0,0,0.3), 5px 5px 0 #000;
-                    transition: transform 0.2s, box-shadow 0.2s, width 0.2s, height 0.2s;
-                    z-index: 10;
-                    cursor: pointer;
-                    font-family: 'Press Start 2P', monospace;
-                    white-space: nowrap;
-                }
-                .pixel-btn:hover {
-                    transform: translateX(-50%) scale(1.1);
-                }
-                .pixel-btn:active {
-                    transform: translate(calc(-50% + 3px), 3px) scale(1.1);
-                    box-shadow: inset -2px -2px 0px 0px rgba(0,0,0,0.3), 2px 2px 0 #000;
-                }
-                .pixel-btn.is-coin {
-                    width: 80px;
-                    height: 80px;
-                    padding: 0;
-                    border-radius: 50%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    color: #b38000; /* Darker yellow for D */
-                    text-shadow: none;
-                    pointer-events: none;
-                    z-index: 10000;
-                    transform: translateX(-50%) scale(1.1);
-                }
-                
-                .event-center-text {
-                    position: absolute;
-                    top: 52%; 
-                    left: 50%;
-                    transform: translate(-50%, 0%);
-                    text-align: center;
-                    z-index: 10;
-                    width: 100%;
-                    padding: 0 20px;
-                    box-sizing: border-box;
-                }
-                .event-center-text h3 {
-                    font-size: clamp(1.5rem, 4vw, 2.5rem);
-                    font-weight: 900;
-                    color: #fff;
-                    margin: 0 0 8px 0;
-                    text-shadow: 2px 2px 0 #000, 0 2px 10px rgba(0,0,0,1);
-                    word-break: keep-all;
-                }
-                .event-center-text p {
-                    font-size: clamp(1rem, 2.5vw, 1.5rem);
-                    font-weight: 700;
-                    color: #bbb;
-                    margin: 0;
-                    text-shadow: 1px 1px 0 #000, 0 1px 5px rgba(0,0,0,1);
-                    word-break: keep-all;
-                }
-                
-                @media(max-width: 768px) {
-                    .pixel-art-wrapper {
-                        width: 280vw; /* More zoom on mobile so height fills more */
-                        min-width: 0;
-                        max-width: none;
-                        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-                        mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-                    }
-                    .pixel-signboard { font-size: 7vw; top: 38%; }
-                    .pixel-btn { font-size: 1.2rem; padding: 15px 35px; bottom: 18%; box-shadow: inset -3px -3px 0px 0px rgba(0,0,0,0.3), 3px 3px 0 #000; }
-                    .pixel-btn:active {
-                        transform: translate(calc(-50% + 2px), 2px) scale(1.1);
-                        box-shadow: inset -2px -2px 0px 0px rgba(0,0,0,0.3), 1px 1px 0 #000;
-                    }
-                    .pixel-btn.is-coin { width: 60px; height: 60px; }
-                    .event-center-text { top: 52%; transform: translate(-50%, 0); }
-                    .event-center-text h3 { font-size: 6vw; margin-bottom: 8px; }
-                    .event-center-text p { font-size: 4.5vw; }
-                }
-            </style>
-            
-            <div class="pixel-art-wrapper" data-aos="zoom-in">
-                <img src="pick-up.png" alt="Pick Up Event" class="pixel-img">
-                <div class="pixel-signboard" data-aos="fade-down" data-aos-delay="200">
-                    Event pick-up
-                </div>
-            </div>
-            
-            <div class="event-center-text" data-aos="fade-up" data-aos-delay="100">
-                <h3>졸업전시 한정 이벤트</h3>
-                <p>당신의 운을 시험해 보세요</p>
-            </div>
-            
-            <a href="gatcha.html?v=40" class="pixel-btn" data-aos="fade-up" data-aos-delay="200" onclick="startCoinAnim(event)">
-                EVENT
-            </a>
-        </div>
-        <!-- Section 5 : ?명꽣 -->
-        <div class="section sec05">
+        <div class="section sec04" id="eventSection" style="height: 100vh; background: url('backcard01.png') 45% center / cover no-repeat; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;">
+    <!-- 어두운 배경 오버레이 (가독성 위해 추가) -->
+    <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1;"></div>
+    
+    <style>
+        .modern-signboard {
+            position: relative;
+            z-index: 10;
+            color: #fff;
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+        
+        .modern-center-text {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 40px;
+        }
+        
+        .modern-center-text h3 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+        
+        .modern-center-text p {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 400;
+            color: #ccc;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+        
+        .modern-btn {
+            position: relative;
+            z-index: 10;
+            background: transparent;
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 15px 50px;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-weight: bold;
+            font-family: 'Noto Sans KR', sans-serif;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .modern-btn:hover {
+            background: #fff;
+            color: #000;
+            transform: scale(1.05);
+        }
+    </style>
+    
+    <div class="modern-signboard" data-aos="fade-down" data-aos-delay="200">
+        PICK-UP EVENT
+    </div>
+    
+    <div class="modern-center-text" data-aos="fade-up" data-aos-delay="100">
+        <h3>졸업전시 한정 이벤트</h3>
+        <p>당신의 운을 시험해보세요</p>
+    </div>
+    
+    <a href="gatcha.html?v=40" class="modern-btn" data-aos="fade-up" data-aos-delay="200" onclick="startCoinAnim(event)">
+        EVENT 참여하기
+    </a>
+</div>
+<!-- Section 5 : 푸터 --><div class="section sec05">
             <div class="footer-content aos-up">
                 <div class="f-center" style="text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;">
                     <img src="dip2.png" alt="dip" style="max-height: 60px; margin-bottom: 20px; display: block;">
@@ -1169,6 +913,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
